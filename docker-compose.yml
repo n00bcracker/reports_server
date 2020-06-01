@@ -1,0 +1,23 @@
+version: '3.4'
+
+x-common-variables: &common-variables
+  ORACLE_USER: ZASPA_AY[PxU_DCBUL_UMA_MOD]
+  ORACLE_PASSWORD: pS_1G1!3
+  ORACLE_TNS: DATALAB
+
+services:
+  reports_server:
+    restart: unless-stopped
+    image: reports_server:latest
+    container_name: reports_server
+    environment:
+      <<: *common-variables
+      MODEL_TYPE: revenue_spark
+      SERVICE_PORT: 80
+      GUNICORN_TIMEOUT: 60
+      SERVICE_WORKERS: 3
+      SERVICE_THREADS: 3
+    volumes:
+      - ./tnsnames.ora:/usr/lib/oracle/19.5/client64/lib/network/admin/tnsnames.ora:ro
+    ports:
+      - '5000:80'
