@@ -12,7 +12,7 @@
         {% if error is not none %}
             <h1>{{error}}</h1>
         {% endif %}
-        <form action="/portfolio_cmp_report" method="POST" enctype="multipart/form-data">
+        <form method="POST" enctype="multipart/form-data">
             <input type="file" name="file">
             <button type="submit">Загрузить</button>
         </form>
