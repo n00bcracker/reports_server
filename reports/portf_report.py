@@ -44,13 +44,16 @@ def read_sql_query(auth_data, sql_query, params=None):
     
     return dataframe
 
-
 def load_request_clients(filename):
+
     request_clients = pd.read_excel(filename, dtype={'ИНН' : np.object, 'КПП' : np.object})
     request_clients.columns = [x.lower() for x in request_clients.columns]
-    request_clients = request_clients.rename(columns={'инн' : 'inn', 'кпп' : 'kpp'})      
+    request_clients = request_clients.rename(columns={'инн' : 'inn', 'кпп' : 'kpp'})
+    request_clients.loc[request_clients.inn.notna(), 'inn'] = request_clients.loc[request_clients.inn.notna(), 'inn']\
+                                                                    .astype(str)
+    request_clients.loc[request_clients.kpp.notna(), 'kpp'] = request_clients.loc[request_clients.kpp.notna(), 'kpp']\
+                                                                    .astype(str)
     return request_clients
-
 
 def chi_sqr_test(rates, counts):
     positive_values = np.round(rates * counts)
