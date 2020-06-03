@@ -37,6 +37,8 @@ def upload_clients_sample():
             return render_template('clients_upload.html', proccesed_file=proccesed_file, error=error)
 
 
-@app.route('/downloaded_files/<filename>')
+@app.route('/downloaded_files/<path:filename>')
 def download_file(filename):
-    send_from_directory(app.config['DOWNLOAD_FOLDER'], filename, as_attachment=True)
+    root_dir = os.getcwd()
+    abs_dir = os.path.join(root_dir, app.config['DOWNLOAD_FOLDER'])
+    return send_from_directory(abs_dir, filename, as_attachment=True)
