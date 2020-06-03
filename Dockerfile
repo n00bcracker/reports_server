@@ -18,6 +18,7 @@ RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 COPY app app
 COPY reports reports
+COPY meta meta
 COPY static static
 COPY templates templates
 COPY uploaded_files uploaded_files
