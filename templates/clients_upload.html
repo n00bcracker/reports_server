@@ -7,7 +7,7 @@
 <body>
     {% if proccesed_file is not none %}
         <h1>Файл успешно загружен и обработан.</h1>
-        <a href={{'./downloaded_files/' + proccesed_file}}>Файл с результами</a>
+        <a href={{proccesed_file}}>Файл с результами</a>
     {% else %}
         {% if error is not none %}
             <h1>{{error}}</h1>
