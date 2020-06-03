@@ -2,7 +2,7 @@ version: '3.4'
 
 x-common-variables: &common-variables
   ORACLE_USER: ZASPA_AY[PxU_DCBUL_UMA_MOD]
-  ORACLE_PASSWORD: pS_1G1!3
+  ORACLE_PASSWORD: pS_1G1!5
   ORACLE_TNS: DATALAB
 
 services:
