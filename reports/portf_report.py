@@ -149,7 +149,7 @@ def make_portf_cmp_report(filename, only_active=False):
                     select *
                         from {POTRFOLIO_TABLE} t
                             where 1=1
-                            and t.ddate = (select max(ddate) from {POTRFOLIO_TABLE})fOL
+                            and t.ddate = (select max(ddate) from {POTRFOLIO_TABLE})
                 """
 
     portf = read_sql_query(datalab_auth, sql_query)
