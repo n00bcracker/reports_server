@@ -2,9 +2,10 @@ import os
 import numpy as np
 import pandas as pd
 import scipy.stats as stats
-from config import DOWNLOAD_FOLDER
-
+from config import DOWNLOAD_FOLDER, ORACLE_USERNAME, ORACLE_PASSWORD, ORACLE_TNS, POTRFOLIO_TABLE
 import sqlalchemy as sa
+
+datalab_auth = (ORACLE_USERNAME, ORACLE_PASSWORD, ORACLE_TNS)
 
 # Список столбцов для агрегатных функций
 group_col = ['req_client',]
@@ -143,16 +144,12 @@ def avg_aggr_statictcs(aggr_portf):
     aggr_portf = aggr_portf.drop(columns=['t_test_pvalue',])
     return aggr_portf
 
-datalab_auth = ('ZASPA_AY[PxU_DCBUL_UMA_MOD]', 'pS_1G1!4', 'DATALAB')
-
-tablename = 'leo_dinam_portf'
-
 def make_portf_cmp_report(filename, only_active=False):
     sql_query = f"""
                     select *
-                        from {tablename} t
+                        from {POTRFOLIO_TABLE} t
                             where 1=1
-                            and t.ddate = (select max(ddate) from {tablename})
+                            and t.ddate = (select max(ddate) from {POTRFOLIO_TABLE})
                 """
 
     portf = read_sql_query(datalab_auth, sql_query)
