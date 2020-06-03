@@ -37,6 +37,6 @@ def upload_clients_sample():
             return render_template('clients_upload.html', proccesed_file=proccesed_file, error=error)
 
 
-@app.route('/downloads/<filename>')
+@app.route('/downloaded_files/<filename>')
 def download_file(filename):
     send_from_directory(app.config['DOWNLOAD_FOLDER'], filename, as_attachment=True)
