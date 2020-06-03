@@ -149,7 +149,7 @@ def make_portf_cmp_report(filename, only_active=False):
                     select *
                         from {POTRFOLIO_TABLE} t
                             where 1=1
-                            and t.ddate = (select max(ddate) from {POTRFOLIO_TABLE})fOL
+                            and t.ddate = (select max(ddate) from {POTRFOLIO_TABLE})
                 """
 
     portf = read_sql_query(datalab_auth, sql_query)
@@ -236,7 +236,7 @@ def make_portf_cmp_report(filename, only_active=False):
     report.loc['Кол-во клиентов', 'Комментарий'] = f'Доля дубликатов: {round(dupl_rate * 100,1)}%'
 
     # Загрузка словаря перевода названий показателей
-    cols_vocab = pd.read_excel('./Словарь перевода показателей портрета.xlsx')
+    cols_vocab = pd.read_excel('meta/Словарь перевода показателей портрета.xlsx')
     cols_vocab.name_eng = cols_vocab.name_eng.str.lower()
     cols_vocab = cols_vocab.set_index('name_eng')
     cols_vocab = cols_vocab.name_rus
