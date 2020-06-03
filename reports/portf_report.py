@@ -149,7 +149,7 @@ def make_portf_cmp_report(filename, only_active=False):
                     select *
                         from {POTRFOLIO_TABLE} t
                             where 1=1
-                            and t.ddate = (select max(ddate) from {POTRFOLIO_TABLE})
+                            and t.ddate = (select max(ddate) from {POTRFOLIO_TABLE})fOL
                 """
 
     portf = read_sql_query(datalab_auth, sql_query)
@@ -185,7 +185,7 @@ def make_portf_cmp_report(filename, only_active=False):
     portf['req_client'] = portf.client_key.isin(request_clients.client_key)
 
     # Выбираем с какой группой будем сравнивать
-    if ONLY_ACTIVE:
+    if only_active:
         portf = portf.loc[portf.req_client | (portf.active == 1), :]
 
     all_cols = group_col + cols_count_aggr + cols_ratio_aggr + cols_ratio_notnull_aggr + ie_ratio_aggr + cols_avg_aggr
