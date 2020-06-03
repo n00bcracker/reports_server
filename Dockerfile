@@ -16,13 +16,13 @@ COPY requirements.txt requirements.txt
 RUN pip install -r requirements.txt; exit 0
 RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
+COPY uploaded_files uploaded_files
+COPY downloaded_files downloaded_files
 COPY app app
 COPY reports reports
 COPY meta meta
 COPY static static
 COPY templates templates
-COPY uploaded_files uploaded_files
-COPY downloaded_files downloaded_files
 COPY config.py boot.sh ./
 
 RUN chmod a+x boot.sh
