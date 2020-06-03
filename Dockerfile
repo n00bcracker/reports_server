@@ -20,6 +20,8 @@ COPY app app
 COPY reports reports
 COPY static static
 COPY templates templates
+COPY uploaded_files uploaded_files
+COPY downloaded_files downloaded_files
 COPY config.py boot.sh ./
 
 RUN chmod a+x boot.sh
