@@ -2,7 +2,7 @@ version: '3.4'
 
 x-common-variables: &common-variables
   ORACLE_USER: ZASPA_AY[PxU_DCBUL_UMA_MOD]
-  ORACLE_PASSWORD: pS_1G1!3
+  ORACLE_PASSWORD: pS_1G1!5
   ORACLE_TNS: DATALAB
 
 services:
@@ -12,7 +12,7 @@ services:
     container_name: reports_server_flask
     environment:
       <<: *common-variables
-      MODEL_TYPE: revenue_spark
+      POTRFOLIO_TABLE: leo_dinam_portf
       SERVICE_PORT: 80
       GUNICORN_TIMEOUT: 60
       SERVICE_WORKERS: 3

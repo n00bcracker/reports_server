@@ -9,3 +9,5 @@ DOWNLOAD_FOLDER = './downloaded_files'
 ORACLE_USERNAME = os.getenv("ORACLE_USER") or None
 ORACLE_PASSWORD = os.getenv("ORACLE_PASSWORD") or None
 ORACLE_TNS = os.getenv("ORACLE_TNS") or None
+
+POTRFOLIO_TABLE = os.getenv("POTRFOLIO_TABLE") or None
