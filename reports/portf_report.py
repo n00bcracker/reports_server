@@ -244,9 +244,10 @@ def make_portf_cmp_report(filename, only_active=False):
     # Переименовываем показатели на русский
     report = report.rename(index=cols_vocab)
 
+    filename = os.path.basename(filename)
     filename_parts = filename.rsplit('.', 1)
     result_filename = filename_parts[0] + '_result.xlsx'
-    full_result_filename = os.path.join(DOWNLOAD_FOLDER, result_filename)
-    report.to_excel(full_result_filename, encoding='utf-8')
+    result_filename = os.path.join(DOWNLOAD_FOLDER, result_filename)
+    report.to_excel(result_filename, encoding='utf-8')
 
     return result_filename
