@@ -9,11 +9,17 @@
         <h3>Файл успешно загружен и обработан.</h3>
         <a href={{proccesed_file}}>Файл с результами</a>
     {% else %}
-        <h3>Загрузите список клиентов банка в формате <a href="./meta/Шаблон запроса.xlsx">шаблона</a>.</h3>
+        <p>С какой группой клиентов будет выполняться сравнение?</p>
+        <select required name="cmp_group" form="upload_file">
+            <option selected disabled>Выберите группу</option>
+            <option  value="all">все</option>
+            <option value="active">только активные</option>
+        </select>
+        <p>Загрузите список клиентов банка в формате <a href="./meta/Шаблон запроса.xlsx">шаблона</a>.</p>
         {% if error is not none %}
             <h4><span style="color: red; ">{{error}}</span></h4>
         {% endif %}
-        <form method="POST" enctype="multipart/form-data">
+        <form id='upload_file' method="POST" enctype="multipart/form-data">
             <input type="file" name="file">
             <button type="submit">Загрузить</button>
         </form>

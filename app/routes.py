@@ -28,14 +28,15 @@ def upload_clients_sample():
                 if file_ext not in ALLOWED_EXTENSIONS:
                     error = 'Выбран не Excel-файл.'
                 else:
+                    group = request.form.get('cmp_group')
+                    only_active = True if group == 'active' else False
                     filename = translit(file.filename, 'ru', reversed=True)
                     filename = secure_filename(filename)
                     filename = os.path.join(app.config['UPLOAD_FOLDER'], filename)
                     file.save(filename)
-                    proccesed_file = make_portf_cmp_report(filename)
+                    proccesed_file = make_portf_cmp_report(filename, only_active)
 
             return render_template('clients_upload.html', proccesed_file=proccesed_file, error=error)
-
 
 @app.route('/downloaded_files/<path:filename>')
 def download_file(filename):
