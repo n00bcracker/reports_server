@@ -1,16 +1,17 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <title>Сравнение клиентов</title>
 </head>
 <body>
     {% if proccesed_file is not none %}
-        <h1>Файл успешно загружен и обработан.</h1>
+        <h3>Файл успешно загружен и обработан.</h3>
         <a href={{proccesed_file}}>Файл с результами</a>
     {% else %}
+        <h3>Загрузите список клиентов банка в формате <a href="./meta/Шаблон запроса.xlsx">шаблона</a>.</h3>
         {% if error is not none %}
-            <h1>{{error}}</h1>
+            <h4><span style="color: red; ">{{error}}</span></h4>
         {% endif %}
         <form method="POST" enctype="multipart/form-data">
             <input type="file" name="file">

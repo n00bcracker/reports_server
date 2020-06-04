@@ -39,6 +39,12 @@ def upload_clients_sample():
 
 @app.route('/downloaded_files/<path:filename>')
 def download_file(filename):
-    root_dir = os.getcwd()
-    abs_dir = os.path.join(root_dir, app.config['DOWNLOAD_FOLDER'])
+    project_dir = os.getcwd()
+    abs_dir = os.path.join(project_dir, app.config['DOWNLOAD_FOLDER'])
+    return send_from_directory(abs_dir, filename, as_attachment=True)
+
+@app.route('/meta/<path:filename>')
+def download_example(filename):
+    project_dir = os.getcwd()
+    abs_dir = os.path.join(project_dir, './meta')
     return send_from_directory(abs_dir, filename, as_attachment=True)
