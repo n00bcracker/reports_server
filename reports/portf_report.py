@@ -34,6 +34,11 @@ cols_avg_aggr = ['life_span_in_bank', 'life_span_business', 'revenue', 'coowner_
                     'num_out_trans_all_life', 'num_contr', 'life_time_mod', 'ltv_rur', 'wallet_share',]
 
 
+request_cl_col_name = 'Знач. показателя для клиентов из выборки'
+other_cl_col_name = 'Знач. показателя для остальных клиентов'
+stat_col_name = 'Уровень достоверности отличия, %'
+
+
 def read_sql_query(auth_data, sql_query, params=None):
     login, password, tns = auth_data[0], auth_data[1], auth_data[2]
     conn_str = 'oracle+cx_oracle://' + login + ':' + password + '@' + tns
@@ -46,10 +51,12 @@ def read_sql_query(auth_data, sql_query, params=None):
     return dataframe
 
 def load_request_clients(filename):
+    # request_clients = pd.read_excel(filename, dtype={'ИНН' : np.object, 'КПП' : np.object})
+    # request_clients.columns = [x.lower() for x in request_clients.columns]
+    # request_clients = request_clients.rename(columns={'инн' : 'inn', 'кпп' : 'kpp'})
 
-    request_clients = pd.read_excel(filename, dtype={'ИНН' : np.object, 'КПП' : np.object})
-    request_clients.columns = [x.lower() for x in request_clients.columns]
-    request_clients = request_clients.rename(columns={'инн' : 'inn', 'кпп' : 'kpp'})
+    request_clients = pd.read_excel(filename, header=None, names=['inn', 'kpp', 'client_key'],
+                                    dtype={'inn': np.object, 'kpp': np.object, 'client_key': np.object})
     request_clients.loc[request_clients.inn.notna(), 'inn'] = request_clients.loc[request_clients.inn.notna(), 'inn']\
                                                                     .astype(str)
     request_clients.loc[request_clients.kpp.notna(), 'kpp'] = request_clients.loc[request_clients.kpp.notna(), 'kpp']\
@@ -212,15 +219,15 @@ def make_portf_cmp_report(filename, only_active=False):
     avg_report = avg_aggr_statictcs(avg_std_aggr_portf)
 
     # Таблица с долями клиентов среди/вне выборки
-    report_ratio = report_ratio.rename(columns={'request_clients_ratio' : 'Знач. показателя для клиентов из выборки',
-                                                'other_clients_ratio' : 'Знач. показателя для остальных клиентов',
-                                                'stat_significance' : 'Уровень достоверности отличия, %'})
+    report_ratio = report_ratio.rename(columns={'request_clients_ratio': request_cl_col_name,
+                                                'other_clients_ratio': other_cl_col_name,
+                                                'stat_significance': stat_col_name})
 
     # Таблица со средним по показателям клиентов среди/вне выборки
-    avg_report = avg_report.rename(columns={'request_clients_mean' : 'Знач. показателя для клиентов из выборки',
-                                                'other_clients_mean' : 'Знач. показателя для остальных клиентов',
-                                                'stat_significance' : 'Уровень достоверности отличия, %',
-                                                'comment' : 'Комментарий'})
+    avg_report = avg_report.rename(columns={'request_clients_mean': request_cl_col_name,
+                                            'other_clients_mean': other_cl_col_name,
+                                            'stat_significance': stat_col_name,
+                                            'comment': 'Комментарий'})
 
     report = pd.concat([report_ratio, avg_report])
     report['Соотношение'] = report.loc[:, 'Знач. показателя для клиентов из выборки'] / \
@@ -229,14 +236,34 @@ def make_portf_cmp_report(filename, only_active=False):
                                'Соотношение', 'Уровень достоверности отличия, %', 'Комментарий']]
     report = report.sort_values('Соотношение', ascending=False)
 
-    count_aggr_portf = count_aggr_portf.rename(columns={'request_clients' : 'Знач. показателя для клиентов из выборки',
-                                                'other_clients' : 'Знач. показателя для остальных клиентов'},
-                                                index={'count' : 'Кол-во клиентов'})
+    count_aggr_portf = count_aggr_portf.rename(columns={'request_clients': request_cl_col_name,
+                                                        'other_clients': other_cl_col_name},
+                                               index={'count': 'Кол-во клиентов'})
     report = pd.concat([count_aggr_portf, report])
     report.loc['Кол-во клиентов', 'Комментарий'] = f'Доля дубликатов: {round(dupl_rate * 100,1)}%'
 
+    # Форматирование
+    ratio_idx_names = cols_ratio_aggr + cols_ratio_notnull_aggr + ie_ratio_aggr
+    cond = report.index.isin(ratio_idx_names)
+    report.loc[cond, [request_cl_col_name, other_cl_col_name]] = report.loc[cond,\
+                                                                    [request_cl_col_name, other_cl_col_name]].round(3)
+
+    trns_cnt_idx_names = ['cnt_in_transactions_per_month', 'cnt_out_transactions_per_month',
+                                                        'cnt_transactions_in_month', 'num_out_trans_all_life']
+    cond = report.index.isin(trns_cnt_idx_names)
+    report.loc[cond, [request_cl_col_name, other_cl_col_name]] = report.loc[cond,\
+                                                                    [request_cl_col_name, other_cl_col_name]].round(1)
+
+    amt_idx_names = ['amount_dvs', 'amount_dvs_mid', 'amount_deposit', 'amount_nso', 'amt_transactions_per_month',
+                     'cash_withdrawal_amount', 'cash_input_amount', 'cash_withdrawal_atm', 'cash_input_atm',
+                     'cash_withdrawal_adm', 'avg_commis_income_3m', 'commission_income', 'ltv_rur', 'revenue',
+                     'revenue_mod', 'revenue_calc', 'sum_revenue_group']
+    cond = report.index.isin(amt_idx_names)
+    report.loc[cond, [request_cl_col_name, other_cl_col_name]] = report.loc[cond,\
+                                                                    [request_cl_col_name, other_cl_col_name]].round(0)
+
     # Загрузка словаря перевода названий показателей
-    cols_vocab = pd.read_excel('meta/Словарь перевода показателей портрета.xlsx')
+    cols_vocab = pd.read_excel('./meta/Словарь перевода показателей портрета.xlsx')
     cols_vocab.name_eng = cols_vocab.name_eng.str.lower()
     cols_vocab = cols_vocab.set_index('name_eng')
     cols_vocab = cols_vocab.name_rus
