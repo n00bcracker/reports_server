@@ -15,7 +15,9 @@
             <option  value="all">все</option>
             <option value="active">только активные</option>
         </select>
-        <p>Загрузите список клиентов банка в формате <a href="./meta/Шаблон запроса.xlsx">шаблона</a>.</p>
+{#        <p>Загрузите список клиентов банка в формате <a href="./meta/Шаблон запроса.xlsx">шаблона</a>.</p>#}
+        <p>Загрузите excel-файл с клиентами в формате, где 1-й столбец - ИНН, 2-й столбец - КПП, 3-й столбец - client_key (инн_кпп).</p>
+        <p style="color: red; ">1-й столбец является обязательным для заполнения.</p>
         {% if error is not none %}
             <h4><span style="color: red; ">{{error}}</span></h4>
         {% endif %}
@@ -23,6 +25,7 @@
             <input type="file" name="file">
             <button type="submit">Загрузить</button>
         </form>
+        <p>Среднее время обработки файла составляет 1-2 минуты.</p>
     {% endif %}
 </body>
 </html>
