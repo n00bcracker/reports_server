@@ -32,7 +32,7 @@ cols_avg_aggr = ['life_span_in_bank', 'life_span_business', 'revenue', 'coowner_
                     'cash_withdrawal_adm', 'commission_income', 'avg_commis_income_3m', 'revenue_mod', 'revenue_calc',
                     'sum_revenue_group', 'count_company_in_group', 'count_company_clients_bank', 'cnt_employees',
                     'num_out_trans_all_life', 'num_contr', 'life_time_mod', 'ltv_rur', 'wallet_share',]
-
+cols_distr_aggr = ['okved_main', ]
 
 request_cl_col_name = 'Знач. показателя для клиентов из выборки'
 other_cl_col_name = 'Знач. показателя для остальных клиентов'
@@ -63,8 +63,18 @@ def load_request_clients(filename):
                                                                     .astype(str)
     return request_clients
 
-def chi_sqr_test(rates, counts):
-    positive_values = np.round(rates * counts)
+def clients_okv_group_code(code):
+    if pd.isnull(code):
+        return np.nan
+    c_arr = code.split('.')
+    if len(c_arr) < 2:
+        return np.nan
+    else:
+        if len(c_arr[1]) == 2 and c_arr[1][-1] == '0': # сливаем одноразрядные оквед и одинаковые окведы(напр: 84.3 и 84.30)
+            c_arr[1] = c_arr[1][:-1]
+        return '.'.join(c_arr[:2])
+
+def chi_sqr_test(positive_values, counts):
     obsrv_values = np.vstack([positive_values, counts - positive_values])
     if np.all(obsrv_values > 10):
         pvalue = stats.chi2_contingency(obsrv_values)[1]
@@ -123,7 +133,10 @@ def ratio_aggr_statictcs(aggr_portf, group_counts):
     aggr_portf = aggr_portf.loc[:, ['request_clients_ratio', 'other_clients_ratio']]
 
     aggr_portf.loc[:, 'p_value'] = aggr_portf.apply(chi_sqr_test, axis=1, args=(group_counts,))
+    # фильтруем по p-value
     aggr_portf = aggr_portf.loc[aggr_portf.p_value < 0.2, :]
+    # считаем доли относительно изначальной выборки
+    aggr_portf.loc[:, ['request_clients_ratio', 'other_clients_ratio']] /= group_counts
     aggr_portf['stat_significance'] = (1 - aggr_portf.p_value) * 100
     aggr_portf = aggr_portf.drop(columns=['p_value',])
     return aggr_portf
@@ -151,6 +164,33 @@ def avg_aggr_statictcs(aggr_portf):
     aggr_portf = aggr_portf.drop(columns=['t_test_pvalue',])
     return aggr_portf
 
+def okved_aggr_statistics(aggr_portf, group_counts):
+    aggr_portf = aggr_portf.unstack().transpose()
+    aggr_portf = aggr_portf.fillna(0.0)
+    aggr_portf.columns.name = None
+    aggr_portf = aggr_portf.rename(columns={True : 'request_clients_ratio', False : 'other_clients_ratio'})
+    aggr_portf = aggr_portf.loc[:, ['request_clients_ratio', 'other_clients_ratio']]
+    # отбираем те ОКВЭД, по которым кол-во клиентов больше 30
+    aggr_portf = aggr_portf.loc[aggr_portf.request_clients_ratio >= 30 ,:]
+    
+    aggr_portf['p_value'] = aggr_portf.apply(chi_sqr_test, axis=1, args=(group_counts,))
+    # считаем доли относительно изначальной выборки
+    aggr_portf.loc[:, ['request_clients_ratio', 'other_clients_ratio']] /= group_counts
+    
+    aggr_portf['ratio'] = aggr_portf.loc[:, 'request_clients_ratio'] / aggr_portf.loc[:, 'other_clients_ratio']
+
+    # оставляем только топ 5 ОКВЭД по отношению
+    aggr_portf = aggr_portf.sort_values(by='ratio', ascending=False)
+    aggr_portf = aggr_portf.iloc[:5, :]
+    
+    # фильтруем по p-value
+    aggr_portf = aggr_portf.loc[aggr_portf.p_value < 0.2, :]
+    
+    aggr_portf['stat_significance'] = (1 - aggr_portf.p_value) * 100
+    aggr_portf = aggr_portf.drop(columns=['p_value',])
+    aggr_portf.index = 'Доля клиентов с ОКВЭД ' + aggr_portf.index
+    return aggr_portf
+
 def make_portf_cmp_report(filename, only_active=False):
     sql_query = f"""
                     select *
@@ -168,6 +208,8 @@ def make_portf_cmp_report(filename, only_active=False):
                                                         .applymap(lambda x : 0 if pd.isnull(x) else 1)
     portf.loc[:, ie_ratio_aggr] = portf.loc[:, ie_ratio_aggr].applymap(lambda x : 0 if x == 'ЮЛ' else 1)
     portf.loc[:, cols_avg_aggr] = portf.loc[:, cols_avg_aggr].astype(float)
+    
+    portf.okved_main = portf.okved_main.apply(clients_okv_group_code)
 
     # Загружаем список клиентов для сравнения
     request_clients = load_request_clients(filename)
@@ -195,15 +237,17 @@ def make_portf_cmp_report(filename, only_active=False):
     if only_active:
         portf = portf.loc[portf.req_client | (portf.active == 1), :]
 
-    all_cols = group_col + cols_count_aggr + cols_ratio_aggr + cols_ratio_notnull_aggr + ie_ratio_aggr + cols_avg_aggr
+    all_cols = group_col + cols_count_aggr + cols_ratio_aggr + cols_ratio_notnull_aggr + ie_ratio_aggr + cols_avg_aggr\
+                                + cols_distr_aggr
     portf = portf.loc[:, all_cols]
 
     # Агрегируем значения
     gr_portf = portf.groupby(by=group_col)
 
-    ratio_aggr_portf = gr_portf[cols_ratio_aggr + cols_ratio_notnull_aggr + ie_ratio_aggr].agg(np.mean)
+    ratio_aggr_portf = gr_portf[cols_ratio_aggr + cols_ratio_notnull_aggr + ie_ratio_aggr].agg(np.sum)
     avg_std_aggr_portf = gr_portf[cols_avg_aggr].agg([np.mean, np.std, 'count'])
     count_aggr_portf = gr_portf[cols_count_aggr].agg('count')
+    okved_aggr_portf = portf.groupby(by=group_col+['okved_main',]).size()
 
     count_aggr_portf = count_aggr_portf.transpose()
     count_aggr_portf.columns.name = None
@@ -217,6 +261,9 @@ def make_portf_cmp_report(filename, only_active=False):
 
     # Считаем статистики для числовых показателей выборки
     avg_report = avg_aggr_statictcs(avg_std_aggr_portf)
+    
+    # Считаем статистики для ОКВЭД выборки
+    okved_report = okved_aggr_statistics(okved_aggr_portf, counts)
 
     # Таблица с долями клиентов среди/вне выборки
     report_ratio = report_ratio.rename(columns={'request_clients_ratio': request_cl_col_name,
@@ -228,12 +275,17 @@ def make_portf_cmp_report(filename, only_active=False):
                                             'other_clients_mean': other_cl_col_name,
                                             'stat_significance': stat_col_name,
                                             'comment': 'Комментарий'})
+    
+    # Таблица со долями клиентов по ОКВЭД
+    okved_report = okved_report.rename(columns={'request_clients_ratio' : request_cl_col_name,
+                                                'other_clients_ratio' : other_cl_col_name,
+                                                'stat_significance' : stat_col_name,
+                                                'ratio' : 'Соотношение'})
 
     report = pd.concat([report_ratio, avg_report])
-    report['Соотношение'] = report.loc[:, 'Знач. показателя для клиентов из выборки'] / \
-                                report.loc[:, 'Знач. показателя для остальных клиентов']
-    report = report.loc[:, ['Знач. показателя для клиентов из выборки', 'Знач. показателя для остальных клиентов',
-                               'Соотношение', 'Уровень достоверности отличия, %', 'Комментарий']]
+    report['Соотношение'] = report.loc[:, request_cl_col_name] / report.loc[:, other_cl_col_name]
+    report = report.loc[:, [request_cl_col_name, other_cl_col_name, 'Соотношение', stat_col_name, 'Комментарий']]
+    report = pd.concat([report, okved_report])
     report = report.sort_values('Соотношение', ascending=False)
 
     count_aggr_portf = count_aggr_portf.rename(columns={'request_clients': request_cl_col_name,
@@ -243,10 +295,10 @@ def make_portf_cmp_report(filename, only_active=False):
     report.loc['Кол-во клиентов', 'Комментарий'] = f'Доля дубликатов: {round(dupl_rate * 100,1)}%'
 
     # Форматирование
-    ratio_idx_names = cols_ratio_aggr + cols_ratio_notnull_aggr + ie_ratio_aggr
+    ratio_idx_names = cols_ratio_aggr + cols_ratio_notnull_aggr + ie_ratio_aggr + list(okved_report.index)
     cond = report.index.isin(ratio_idx_names)
-    report.loc[cond, [request_cl_col_name, other_cl_col_name]] = report.loc[cond,\
-                                                                    [request_cl_col_name, other_cl_col_name]].round(3)
+    report.loc[cond, [request_cl_col_name, other_cl_col_name]] =\
+                                                    report.loc[cond, [request_cl_col_name, other_cl_col_name]].round(3)
 
     trns_cnt_idx_names = ['cnt_in_transactions_per_month', 'cnt_out_transactions_per_month',
                                                         'cnt_transactions_in_month', 'num_out_trans_all_life']
