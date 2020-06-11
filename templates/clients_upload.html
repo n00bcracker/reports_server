@@ -1,31 +1,56 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <title>Сравнение клиентов</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <link rel="apple-touch-icon" type="image/png" href="https://cdn.open.ru/packs/media/src/front/images/apple-touch-icon_57-a3c763250c283fd1f8a6980525463c08.png" sizes="57x57" />
+    <link rel="apple-touch-icon" type="image/png" href="https://cdn.open.ru/packs/media/src/front/images/apple-touch-icon_60-b3bf6546955cc936904b7cfc361013f3.png" sizes="60x60" />
+    <link rel="apple-touch-icon" type="image/png" href="https://cdn.open.ru/packs/media/src/front/images/apple-touch-icon_72-dbfbb9278e313556cad4b51ff6d715c6.png" sizes="72x72" />
+    <link rel="apple-touch-icon" type="image/png" href="https://cdn.open.ru/packs/media/src/front/images/apple-touch-icon_76-1768f529f6ac8e9c69185c12825d81d3.png" sizes="76x76" />
+    <link rel="apple-touch-icon" type="image/png" href="https://cdn.open.ru/packs/media/src/front/images/apple-touch-icon_114-9a646e57829494955926185f88e0192b.png" sizes="114x114" />
+    <link rel="apple-touch-icon" type="image/png" href="https://cdn.open.ru/packs/media/src/front/images/apple-touch-icon_120-389963ae571fdc88452e95a0e5f38f29.png" sizes="120x120" />
+    <link rel="apple-touch-icon" type="image/png" href="https://cdn.open.ru/packs/media/src/front/images/apple-touch-icon_144-7a626df073226e5db4a24c394d815f59.png" sizes="144x144" />
+    <link rel="apple-touch-icon" type="image/png" href="https://cdn.open.ru/packs/media/src/front/images/apple-touch-icon_152-6dbe7f60fe32a06810c45288698b9153.png" sizes="152x152" />
+    <link rel="apple-touch-icon" type="image/png" href="https://cdn.open.ru/packs/media/src/front/images/apple-touch-icon_180-4d1b09747a9141b29a44000a8eae9fa9.png" sizes="180x180" />
+    <link rel="shortcut icon" type="image/png" href="https://cdn.open.ru/packs/media/src/front/images/favicon_16-821d43320e8206f972c6c8a56f059759.png" sizes="16x16" />
+    <link rel="shortcut icon" type="image/png" href="https://cdn.open.ru/packs/media/src/front/images/favicon_32-391f19577c39ddf0cb3eec0de81b5fff.png" sizes="32x32" />
+    <link rel="shortcut icon" type="image/png" href="https://cdn.open.ru/packs/media/src/front/images/favicon_48-c78887cbeed9bcf7580234d052f81469.png" sizes="48x48" />
+    <link rel="shortcut icon" type="image/png" href="https://cdn.open.ru/packs/media/src/front/images/favicon_64-d6ea8eefad955fc29a784d5eb8fa9ed3.png" sizes="64x64" />
+    <link rel="shortcut icon" type="image/png" href="https://cdn.open.ru/packs/media/src/front/images/favicon_128-cac00f0b309ea2fea1bda06c0fc812e9.png" sizes="128x128" />
+    <link rel="shortcut icon" type="image/png" href="https://cdn.open.ru/packs/media/src/front/images/favicon_160-34bb912395e9f9f6415a5ff8f4b00e71.png" sizes="160x160" />
+    <link rel="shortcut icon" type="image/png" href="https://cdn.open.ru/packs/media/src/front/images/favicon_192-a036cbc768e8aeb83d02cc0ffee1749e.png" sizes="192x192" />
+    <link rel="mask-icon" type="image/svg+xml" href="https://cdn.open.ru/packs/media/src/front/images/touchbar-icon-bddf9a376a6a56019750b12c658f02a0.svg" color="00B4E3" />
+    <title>Автоаналитика</title>
 </head>
-<body>
+<body style="font: 16px Arial, Times New Roman, Times, serif" align="center">
+    <h2>
+        <span style="color: #00A0EE; ">Департамент CRM МСБ</span>
+        <img height="40" alt="Автоаналитика ДCRM МСБ" src="https://net.open.ru/common/intranet/new/images/nlogom.png">
+    </h2>
+    <span style="font-size: large; "><b>Автоаналитика</b> - сервис моментального построения профиля клиентов</span><br><br><br>
     {% if proccesed_file is not none %}
         <h3>Файл успешно загружен и обработан.</h3>
         <a href={{proccesed_file}}>Файл с результами</a>
     {% else %}
-        <p>С какой группой клиентов будет выполняться сравнение?</p>
-        <select required name="cmp_group" form="upload_file">
-            <option selected disabled>Выберите группу</option>
-            <option  value="all">все</option>
-            <option value="active">только активные</option>
-        </select>
+        <p>
+            Выберите группу с которой будет производится сравнение
+            <select required name="cmp_group" form="upload_file">
+                <option selected disabled>Выберите группу</option>
+                <option value="all">все</option>
+                <option value="active">только активные</option>
+            </select>
+        </p>
+
 {#        <p>Загрузите список клиентов банка в формате <a href="./meta/Шаблон запроса.xlsx">шаблона</a>.</p>#}
-        <p>Загрузите excel-файл с клиентами в формате, где 1-й столбец - ИНН, 2-й столбец - КПП, 3-й столбец - client_key (инн_кпп).</p>
-        <p style="color: red; ">1-й либо 3-йстолбец является обязательным для заполнения.</p>
+        <p>Загрузите excel-файл с клиентами в формате, где 1-й столбец - ИНН, 2-й столбец - КПП, 3-й столбец - client_key (инн_кпп) - без заголовков, только данные в нужных столбцах.</p>
+        <p style="color: red; ">1-й либо 3-й столбец является обязательным для заполнения.</p>
         {% if error is not none %}
             <h4><span style="color: red; ">{{error}}</span></h4>
         {% endif %}
         <form id='upload_file' method="POST" enctype="multipart/form-data">
             <input type="file" name="file">
             <button type="submit">Загрузить</button>
-        </form>
-        <p style="color: darkorange; ">Из-за высокой нагруженности сервера время обработки файла может занимать до 10 минут.</p>
+        </form><br><br>
+        <p style="color: darkorange; ">Из-за высокой загруженности сервера время обработки файла может занимать до 10 минут.</p>
     {% endif %}
 </body>
 </html>
