@@ -32,7 +32,7 @@ cols_avg_aggr = ['life_span_in_bank', 'life_span_business', 'revenue', 'coowner_
                     'cash_withdrawal_adm', 'commission_income', 'avg_commis_income_3m', 'revenue_mod', 'revenue_calc',
                     'sum_revenue_group', 'count_company_in_group', 'count_company_clients_bank', 'cnt_employees',
                     'num_out_trans_all_life', 'num_contr', 'life_time_mod', 'ltv_rur', 'wallet_share',]
-cols_distr_aggr = ['okved_main', ]
+cols_distr_aggr = ['okved_main', 'hub_city',]
 
 request_cl_col_name = 'Знач. показателя для клиентов из выборки'
 other_cl_col_name = 'Знач. показателя для остальных клиентов'
@@ -173,11 +173,15 @@ def okved_aggr_statistics(aggr_portf, group_counts):
     # отбираем те ОКВЭД, по которым кол-во клиентов больше 30
     aggr_portf = aggr_portf.loc[aggr_portf.request_clients_ratio >= 30 ,:]
     
-    aggr_portf['p_value'] = aggr_portf.apply(chi_sqr_test, axis=1, args=(group_counts,))
+    if aggr_portf.shape[0] > 0:
+        aggr_portf['p_value'] = aggr_portf.apply(chi_sqr_test, axis=1, args=(group_counts,))
+    else:
+        aggr_portf['p_value'] = aggr_portf.request_clients_ratio
+            
     # считаем доли относительно изначальной выборки
     aggr_portf.loc[:, ['request_clients_ratio', 'other_clients_ratio']] /= group_counts
     
-    aggr_portf['ratio'] = aggr_portf.loc[:, 'request_clients_ratio'] / aggr_portf.loc[:, 'other_clients_ratio']
+    aggr_portf['ratio'] = aggr_portf.request_clients_ratio / aggr_portf.other_clients_ratio
 
     # оставляем только топ 5 ОКВЭД по отношению
     aggr_portf = aggr_portf.sort_values(by='ratio', ascending=False)
@@ -189,6 +193,37 @@ def okved_aggr_statistics(aggr_portf, group_counts):
     aggr_portf['stat_significance'] = (1 - aggr_portf.p_value) * 100
     aggr_portf = aggr_portf.drop(columns=['p_value',])
     aggr_portf.index = 'Доля клиентов с ОКВЭД ' + aggr_portf.index
+    return aggr_portf
+
+def city_aggr_statistics(aggr_portf, group_counts):
+    aggr_portf = aggr_portf.unstack().transpose()
+    aggr_portf = aggr_portf.fillna(0.0)
+    aggr_portf.columns.name = None
+    aggr_portf = aggr_portf.rename(columns={True : 'request_clients_ratio', False : 'other_clients_ratio'})
+    aggr_portf = aggr_portf.loc[:, ['request_clients_ratio', 'other_clients_ratio']]
+    # отбираем те города, по которым кол-во клиентов больше 30
+    aggr_portf = aggr_portf.loc[aggr_portf.request_clients_ratio >= 30 ,:]
+    
+    if aggr_portf.shape[0] > 0:
+        aggr_portf['p_value'] = aggr_portf.apply(chi_sqr_test, axis=1, args=(group_counts,))
+    else:
+        aggr_portf['p_value'] = aggr_portf.request_clients_ratio
+            
+    # считаем доли относительно изначальной выборки
+    aggr_portf.loc[:, ['request_clients_ratio', 'other_clients_ratio']] /= group_counts
+    
+    aggr_portf['ratio'] = aggr_portf.request_clients_ratio / aggr_portf.other_clients_ratio
+
+    # оставляем только топ 5 городов по отношению
+    aggr_portf = aggr_portf.sort_values(by='ratio', ascending=False)
+    aggr_portf = aggr_portf.iloc[:5, :]
+    
+    # фильтруем по p-value
+    aggr_portf = aggr_portf.loc[aggr_portf.p_value < 0.2, :]
+    
+    aggr_portf['stat_significance'] = (1 - aggr_portf.p_value) * 100
+    aggr_portf = aggr_portf.drop(columns=['p_value',])
+    aggr_portf.index = 'Доля г. ' + aggr_portf.index
     return aggr_portf
 
 def make_portf_cmp_report(filename, only_active=False):
@@ -248,6 +283,7 @@ def make_portf_cmp_report(filename, only_active=False):
     avg_std_aggr_portf = gr_portf[cols_avg_aggr].agg([np.mean, np.std, 'count'])
     count_aggr_portf = gr_portf[cols_count_aggr].agg('count')
     okved_aggr_portf = portf.groupby(by=group_col+['okved_main',]).size()
+    city_aggr_portf = portf.groupby(by=group_col+['hub_city',]).size()
 
     count_aggr_portf = count_aggr_portf.transpose()
     count_aggr_portf.columns.name = None
@@ -264,6 +300,9 @@ def make_portf_cmp_report(filename, only_active=False):
     
     # Считаем статистики для ОКВЭД выборки
     okved_report = okved_aggr_statistics(okved_aggr_portf, counts)
+    
+    # Считаем статистики для городов выборки
+    city_report = city_aggr_statistics(city_aggr_portf, counts)
 
     # Таблица с долями клиентов среди/вне выборки
     report_ratio = report_ratio.rename(columns={'request_clients_ratio': request_cl_col_name,
@@ -281,11 +320,19 @@ def make_portf_cmp_report(filename, only_active=False):
                                                 'other_clients_ratio' : other_cl_col_name,
                                                 'stat_significance' : stat_col_name,
                                                 'ratio' : 'Соотношение'})
+    
+    # Таблица со долями клиентов по городам
+    city_report = city_report.rename(columns={'request_clients_ratio' : request_cl_col_name,
+                                                'other_clients_ratio' : other_cl_col_name,
+                                                'stat_significance' : stat_col_name,
+                                                'ratio' : 'Соотношение'})
 
     report = pd.concat([report_ratio, avg_report])
     report['Соотношение'] = report.loc[:, request_cl_col_name] / report.loc[:, other_cl_col_name]
     report = report.loc[:, [request_cl_col_name, other_cl_col_name, 'Соотношение', stat_col_name, 'Комментарий']]
-    report = pd.concat([report, okved_report])
+    report = pd.concat([report, okved_report, city_report])
+    print(report.columns)
+    
     report = report.sort_values('Соотношение', ascending=False)
 
     count_aggr_portf = count_aggr_portf.rename(columns={'request_clients': request_cl_col_name,
@@ -295,7 +342,9 @@ def make_portf_cmp_report(filename, only_active=False):
     report.loc['Кол-во клиентов', 'Комментарий'] = f'Доля дубликатов: {round(dupl_rate * 100,1)}%'
 
     # Форматирование
-    ratio_idx_names = cols_ratio_aggr + cols_ratio_notnull_aggr + ie_ratio_aggr + list(okved_report.index)
+    ratio_idx_names = cols_ratio_aggr + cols_ratio_notnull_aggr + ie_ratio_aggr + list(okved_report.index)\
+                                        + list(city_report.index)
+    
     cond = report.index.isin(ratio_idx_names)
     report.loc[cond, [request_cl_col_name, other_cl_col_name]] =\
                                                     report.loc[cond, [request_cl_col_name, other_cl_col_name]].round(3)
@@ -327,6 +376,7 @@ def make_portf_cmp_report(filename, only_active=False):
     filename_parts = filename.rsplit('.', 1)
     result_filename = filename_parts[0] + '_result.xlsx'
     result_filename = os.path.join(DOWNLOAD_FOLDER, result_filename)
+    print(report.columns)
     report.to_excel(result_filename, encoding='utf-8')
 
     return result_filename
