@@ -1,5 +1,6 @@
 import os
 from flask import flash, request, redirect, url_for, render_template, send_from_directory
+from werkzeug.exceptions import RequestEntityTooLarge
 from werkzeug.utils import secure_filename
 from transliterate import translit
 from reports.portf_report import make_portf_cmp_report
@@ -19,9 +20,10 @@ def upload_clients_sample():
             return redirect(request.url)
         else:
             file = request.files['file']
-            # if user does not select file, browser also submit an empty part without filename
             if file.filename == '':
                 error = 'Файл не выбран.'
+            elif request.content_length > 5 * 1024 * 1024:
+                error = 'Размер файла превышает 5 Мб.'
             else:
                 filename_parts = file.filename.rsplit('.', 1)
                 file_ext = filename_parts[1].lower() if len(filename_parts) == 2 else ''
