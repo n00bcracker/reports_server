@@ -44,7 +44,12 @@ def upload_clients_sample():
 def download_file(filename):
     project_dir = os.getcwd()
     abs_dir = os.path.join(project_dir, app.config['DOWNLOAD_FOLDER'])
-    return send_from_directory(abs_dir, filename, as_attachment=True)
+    resp = send_from_directory(abs_dir, filename, as_attachment=True)
+    resp.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+    resp.headers["Pragma"] = "no-cache"
+    resp.headers["Expires"] = "0"
+    resp.headers['Cache-Control'] = 'public, max-age=0'
+    return resp
 
 @app.route('/meta/<path:filename>')
 def download_example(filename):
