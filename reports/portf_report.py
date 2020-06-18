@@ -5,6 +5,11 @@ import scipy.stats as stats
 from config import DOWNLOAD_FOLDER, ORACLE_USERNAME, ORACLE_PASSWORD, ORACLE_TNS, POTRFOLIO_TABLE
 import sqlalchemy as sa
 
+class NotValidClients(Exception):
+    def __init__(self, message, file_id):
+        self.message = message
+        self.file_id = file_id
+
 datalab_auth = (ORACLE_USERNAME, ORACLE_PASSWORD, ORACLE_TNS)
 
 # Список столбцов для агрегатных функций
@@ -50,18 +55,30 @@ def read_sql_query(auth_data, sql_query, params=None):
     
     return dataframe
 
-def load_request_clients(filename):
-    # request_clients = pd.read_excel(filename, dtype={'ИНН' : np.object, 'КПП' : np.object})
-    # request_clients.columns = [x.lower() for x in request_clients.columns]
-    # request_clients = request_clients.rename(columns={'инн' : 'inn', 'кпп' : 'kpp'})
+def load_clients(filename):
+    # clients = pd.read_excel(filename, dtype={'ИНН' : np.object, 'КПП' : np.object})
+    # clients.columns = [x.lower() for x in clients.columns]
+    # clients = clients.rename(columns={'инн' : 'inn', 'кпп' : 'kpp'})
 
-    request_clients = pd.read_excel(filename, header=None, names=['inn', 'kpp', 'client_key'],
-                                    dtype={'inn': np.object, 'kpp': np.object, 'client_key': np.object})
-    request_clients.loc[request_clients.inn.notna(), 'inn'] = request_clients.loc[request_clients.inn.notna(), 'inn']\
-                                                                    .astype(str)
-    request_clients.loc[request_clients.kpp.notna(), 'kpp'] = request_clients.loc[request_clients.kpp.notna(), 'kpp']\
-                                                                    .astype(str)
-    return request_clients
+    clients = pd.read_excel(filename, header=None, names=['inn', 'kpp', 'client_key'],\
+                                    dtype={'inn' : np.object, 'kpp' : np.object, 'client_key' : np.object})
+
+    clients.loc[clients.inn.notna(), 'inn'] = clients.loc[clients.inn.notna(), 'inn'].astype(str)
+    clients.loc[clients.kpp.notna(), 'kpp'] = clients.loc[clients.kpp.notna(), 'kpp'].astype(str)
+    return clients
+
+def select_valid_clients(clients, portf):
+    clients_with_ck = clients.loc[clients.client_key.notna(), :]
+    clients_inn_kpp = clients.loc[~clients.client_key.notna(), :]
+    clients_inn_kpp = clients_inn_kpp.drop(columns=['client_key',])
+
+    clients_with_kpp = clients_inn_kpp.loc[clients_inn_kpp.kpp.notna(), ['inn', 'kpp']]
+    clients_with_kpp = clients_with_kpp.merge(portf, on=['inn', 'kpp'])                                                            .loc[:, ['inn', 'kpp', 'client_key']]
+
+    clients_with_inn = clients_inn_kpp.loc[~clients_inn_kpp.kpp.notna(), ['inn',]]
+    clients_with_inn = clients_with_inn.merge(portf, on=['inn',]).loc[:, ['inn', 'kpp', 'client_key']]
+    clients = pd.concat([clients_with_ck, clients_with_kpp, clients_with_inn])
+    return clients
 
 def clients_okv_group_code(code):
     if pd.isnull(code):
@@ -226,7 +243,7 @@ def city_aggr_statistics(aggr_portf, group_counts):
     aggr_portf.index = 'Доля г. ' + aggr_portf.index
     return aggr_portf
 
-def make_portf_cmp_report(filename, only_active=False):
+def make_portf_cmp_report(filename, only_active=False, other_clients_filename=None):
     sql_query = f"""
                     select *
                         from {POTRFOLIO_TABLE} t
@@ -247,20 +264,17 @@ def make_portf_cmp_report(filename, only_active=False):
     portf.okved_main = portf.okved_main.apply(clients_okv_group_code)
 
     # Загружаем список клиентов для сравнения
-    request_clients = load_request_clients(filename)
-    if request_clients.client_key.isna().all():
-        if request_clients.inn.notna().any():
-            request_clients = request_clients.drop(columns=['client_key',])
-            request_clients_with_kpp = request_clients.loc[request_clients.kpp.notna(), ['inn', 'kpp']]
-            request_clients_with_kpp = request_clients_with_kpp.merge(portf, on=['inn', 'kpp'])\
-                                                                    .loc[:, ['inn', 'kpp', 'client_key']]
+    request_clients = load_clients(filename)
+    request_clients = select_valid_clients(request_clients)
 
-            request_clients_with_inn = request_clients.loc[~request_clients.kpp.notna(), ['inn',]]
-            request_clients_with_inn = request_clients_with_inn.merge(portf, on=['inn',])\
-                                                                .loc[:, ['inn', 'kpp', 'client_key']]
-            request_clients = pd.concat([request_clients_with_kpp, request_clients_with_inn])
-    else:
-        print('Отсутствуют ИНН')
+    if request_clients.shape[0] == 0:
+        raise NotValidClients('Отсутствуют корректные идентификаторы клиентов в файле.', 'requested_cl_file')
+
+    if other_clients_filename is not None:
+        other_clients = load_clients(other_clients_filename)
+        other_clients = select_valid_clients(other_clients, portf)
+        if other_clients.shape[0] == 0:
+            raise NotValidClients('Отсутствуют корректные идентификаторы клиентов в файле.', 'other_cl_file')
 
     cnt_dupl_clients = request_clients.duplicated(subset=['client_key',]).sum()
     dupl_rate = cnt_dupl_clients / request_clients.shape[0]
@@ -271,6 +285,8 @@ def make_portf_cmp_report(filename, only_active=False):
     # Выбираем с какой группой будем сравнивать
     if only_active:
         portf = portf.loc[portf.req_client | (portf.active == 1), :]
+    elif other_clients_filename is not None:
+        portf = portf.loc[portf.req_client | portf.client_key.isin(other_clients.client_key), :]
 
     all_cols = group_col + cols_count_aggr + cols_ratio_aggr + cols_ratio_notnull_aggr + ie_ratio_aggr + cols_avg_aggr\
                                 + cols_distr_aggr
@@ -331,7 +347,6 @@ def make_portf_cmp_report(filename, only_active=False):
     report['Соотношение'] = report.loc[:, request_cl_col_name] / report.loc[:, other_cl_col_name]
     report = report.loc[:, [request_cl_col_name, other_cl_col_name, 'Соотношение', stat_col_name, 'Комментарий']]
     report = pd.concat([report, okved_report, city_report])
-    print(report.columns)
     
     report = report.sort_values('Соотношение', ascending=False)
 
@@ -376,7 +391,6 @@ def make_portf_cmp_report(filename, only_active=False):
     filename_parts = filename.rsplit('.', 1)
     result_filename = filename_parts[0] + '_result.xlsx'
     result_filename = os.path.join(DOWNLOAD_FOLDER, result_filename)
-    print(report.columns)
     report.to_excel(result_filename, encoding='utf-8')
 
     return result_filename

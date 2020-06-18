@@ -31,7 +31,8 @@
     <span style="font-size: large; "><b>Автоаналитика</b> - сервис моментального построения профиля клиентов</span><br><br><br>
     {% if proccesed_file is not none %}
         <h3>Файл успешно загружен и обработан.</h3>
-        <a href={{proccesed_file}}>Файл с результами</a>
+        <a href={{proccesed_file}}>Файл с результами</a><br><br><br>
+        <a href=./>Обработать еще файл.</a>
     {% else %}
         <p>
             Выберите группу с которой будет производится сравнение
@@ -39,19 +40,24 @@
                 <option selected disabled>Выберите группу</option>
                 <option value="all">все</option>
                 <option value="active">только активные</option>
+                <option value="other">своя выборка</option>
             </select>
         </p>
+        <input type="file" name="other_cl_file" form="upload_file">
+        {% if errors['other_file_error'] is not none %}
+            <p style="color: red; ">{{errors['other_file_error']}}</p>
+        {% endif %}
 
 {#        <p>Загрузите список клиентов банка в формате <a href="./meta/Шаблон запроса.xlsx">шаблона</a>.</p>#}
         <p>Загрузите excel-файл с клиентами в формате, где 1-й столбец - ИНН, 2-й столбец - КПП, 3-й столбец - client_key (инн_кпп) - без заголовков, только данные в нужных столбцах.</p>
         <p style="color: red; ">1-й либо 3-й столбец является обязательным для заполнения.</p>
-        {% if error is not none %}
-            <h4><span style="color: red; ">{{error}}</span></h4>
-        {% endif %}
         <form id='upload_file' method="POST" enctype="multipart/form-data">
-            <input type="file" name="file">
+            <input type="file" name="requested_cl_file">
             <button type="submit">Загрузить</button>
-        </form><br><br>
+        </form>
+        {% if errors['request_file_error'] is not none %}
+            <p style="color: red; ">{{errors['request_file_error']}}</p>
+        {% endif %}<br><br>
         <p style="color: darkorange; ">Из-за высокой загруженности сервера время обработки файла может занимать до 10 минут.</p>
     {% endif %}
 </body>
