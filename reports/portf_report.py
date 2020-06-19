@@ -265,7 +265,7 @@ def make_portf_cmp_report(filename, only_active=False, other_clients_filename=No
 
     # Загружаем список клиентов для сравнения
     request_clients = load_clients(filename)
-    request_clients = select_valid_clients(request_clients)
+    request_clients = select_valid_clients(request_clients, portf)
 
     if request_clients.shape[0] == 0:
         raise NotValidClients('Отсутствуют корректные идентификаторы клиентов в файле.', 'requested_cl_file')
