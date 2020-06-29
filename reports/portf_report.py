@@ -1,6 +1,7 @@
 import os
 import numpy as np
 import pandas as pd
+import re
 import scipy.stats as stats
 from config import DOWNLOAD_FOLDER, ORACLE_USERNAME, ORACLE_PASSWORD, ORACLE_TNS, POTRFOLIO_TABLE
 import sqlalchemy as sa
@@ -44,6 +45,43 @@ other_cl_col_name = 'Знач. показателя для остальных к
 stat_col_name = 'Уровень достоверности отличия, %'
 
 
+def decipher_inn(inn_cipher):
+    id_inn_pattern = re.compile(r'(.+)P')
+    ciph_inn_tr_tbl = str.maketrans('ZVMJCSDQRL', '0123456789')
+
+    inn_c_match = id_inn_pattern.match(inn_cipher)
+    if inn_c_match is not None:
+        inn_cipher = inn_c_match.group(1)
+
+        inn_cipher = inn_cipher.replace('X', '.5')
+        inn_cipher = inn_cipher.translate(ciph_inn_tr_tbl)
+
+        if re.match(r'^[\d\.]+$', inn_cipher) is not None:
+            inn = str(int(float(inn_cipher) * 2))[1::][::-1]
+            if len(inn) == 10 or len(inn) == 12:
+                return inn
+
+    return np.nan
+
+
+def decipher_kpp(kpp_cipher):
+    id_kpp_pattern = re.compile(r'.+P(.+)')
+    ciph_kpp_tr_tbl = str.maketrans('NLDRJQWYBA', '0123456789')
+
+    kpp_c_match = id_kpp_pattern.search(kpp_cipher)
+    if kpp_c_match is not None:
+        kpp_cipher = kpp_c_match.group(1)
+
+        kpp_cipher = kpp_cipher.replace('Z', '.5')
+        kpp_cipher = kpp_cipher.translate(ciph_kpp_tr_tbl)
+
+        if re.match(r'^[\d\.]+$', kpp_cipher) is not None:
+            kpp = str(int(float(kpp_cipher) * 2))[1::][::-1]
+            if len(kpp) == 9:
+                return kpp
+
+    return np.nan
+
 def read_sql_query(auth_data, sql_query, params=None):
     login, password, tns = auth_data[0], auth_data[1], auth_data[2]
     conn_str = 'oracle+cx_oracle://' + login + ':' + password + '@' + tns
@@ -60,23 +98,34 @@ def load_clients(filename):
     # clients.columns = [x.lower() for x in clients.columns]
     # clients = clients.rename(columns={'инн' : 'inn', 'кпп' : 'kpp'})
 
-    clients = pd.read_excel(filename, header=None, names=['inn', 'kpp', 'client_key'],\
-                                    dtype={'inn' : np.object, 'kpp' : np.object, 'client_key' : np.object})
+    clients = pd.read_excel(filename, header=None, names=['inn', 'kpp', 'client_key', 'encrypt_id'],\
+                                                                                        dtype={
+                                                                                            'inn': np.object,
+                                                                                            'kpp': np.object,
+                                                                                            'client_key': np.object,
+                                                                                            'encrypt_id': np.object
+                                                                                        })
 
     clients.loc[clients.inn.notna(), 'inn'] = clients.loc[clients.inn.notna(), 'inn'].astype(str)
     clients.loc[clients.kpp.notna(), 'kpp'] = clients.loc[clients.kpp.notna(), 'kpp'].astype(str)
     return clients
 
 def select_valid_clients(clients, portf):
-    clients_with_ck = clients.loc[clients.client_key.notna(), :]
-    clients_inn_kpp = clients.loc[~clients.client_key.notna(), :]
-    clients_inn_kpp = clients_inn_kpp.drop(columns=['client_key',])
+    clients_with_ck = clients.loc[clients.client_key.notna(), ['inn', 'kpp', 'client_key']]
+    clients_without_ck = clients.loc[~clients.client_key.notna(), :]
+    clients_without_ck = clients_without_ck.drop(columns=['client_key', ])
 
-    clients_with_kpp = clients_inn_kpp.loc[clients_inn_kpp.kpp.notna(), ['inn', 'kpp']]
-    clients_with_kpp = clients_with_kpp.merge(portf, on=['inn', 'kpp'])                                                            .loc[:, ['inn', 'kpp', 'client_key']]
+    cl_with_encr_id_cond = clients_without_ck.encrypt_id.notna()
+    clients_without_ck.loc[cl_with_encr_id_cond, 'inn'] = clients_without_ck.loc[cl_with_encr_id_cond, 'encrypt_id']\
+                                                            .apply(decipher_inn)
+    clients_without_ck.loc[cl_with_encr_id_cond, 'kpp'] = clients_without_ck.loc[cl_with_encr_id_cond, 'encrypt_id']\
+                                                            .apply(decipher_kpp)
 
-    clients_with_inn = clients_inn_kpp.loc[~clients_inn_kpp.kpp.notna(), ['inn',]]
-    clients_with_inn = clients_with_inn.merge(portf, on=['inn',]).loc[:, ['inn', 'kpp', 'client_key']]
+    clients_with_kpp = clients_without_ck.loc[clients_without_ck.kpp.notna(), ['inn', 'kpp']]
+    clients_with_kpp = clients_with_kpp.merge(portf, on=['inn', 'kpp']).loc[:, ['inn', 'kpp', 'client_key']]
+
+    clients_with_inn = clients_without_ck.loc[~clients_without_ck.kpp.notna(), ['inn', ]]
+    clients_with_inn = clients_with_inn.merge(portf, on=['inn', ]).loc[:, ['inn', 'kpp', 'client_key']]
     clients = pd.concat([clients_with_ck, clients_with_kpp, clients_with_inn])
     return clients
 
@@ -188,7 +237,7 @@ def okved_aggr_statistics(aggr_portf, group_counts):
     aggr_portf = aggr_portf.rename(columns={True : 'request_clients_ratio', False : 'other_clients_ratio'})
     aggr_portf = aggr_portf.loc[:, ['request_clients_ratio', 'other_clients_ratio']]
     # отбираем те ОКВЭД, по которым кол-во клиентов больше 30
-    aggr_portf = aggr_portf.loc[aggr_portf.request_clients_ratio >= 30 ,:]
+    aggr_portf = aggr_portf.loc[(aggr_portf.request_clients_ratio >= 30) & (aggr_portf.other_clients_ratio >= 30),:]
     
     if aggr_portf.shape[0] > 0:
         aggr_portf['p_value'] = aggr_portf.apply(chi_sqr_test, axis=1, args=(group_counts,))
@@ -219,7 +268,7 @@ def city_aggr_statistics(aggr_portf, group_counts):
     aggr_portf = aggr_portf.rename(columns={True : 'request_clients_ratio', False : 'other_clients_ratio'})
     aggr_portf = aggr_portf.loc[:, ['request_clients_ratio', 'other_clients_ratio']]
     # отбираем те города, по которым кол-во клиентов больше 30
-    aggr_portf = aggr_portf.loc[aggr_portf.request_clients_ratio >= 30 ,:]
+    aggr_portf = aggr_portf.loc[(aggr_portf.request_clients_ratio >= 30) & (aggr_portf.other_clients_ratio >= 30),:]
     
     if aggr_portf.shape[0] > 0:
         aggr_portf['p_value'] = aggr_portf.apply(chi_sqr_test, axis=1, args=(group_counts,))
