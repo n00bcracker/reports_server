@@ -192,22 +192,28 @@ def comment_variance(row):
         comment = np.nan
     return comment
 
-def ratio_aggr_statictcs(aggr_portf, group_counts):
+def ratio_aggr_statictcs(aggr_portf, group_counts, with_tests=True):
     aggr_portf = aggr_portf.transpose()
     aggr_portf.columns.name = None
     aggr_portf = aggr_portf.rename(columns={True : 'request_clients_ratio', False : 'other_clients_ratio'})
     aggr_portf = aggr_portf.loc[:, ['request_clients_ratio', 'other_clients_ratio']]
 
-    aggr_portf.loc[:, 'p_value'] = aggr_portf.apply(chi_sqr_test, axis=1, args=(group_counts,))
-    # фильтруем по p-value
-    aggr_portf = aggr_portf.loc[aggr_portf.p_value < 0.2, :]
+    if with_tests:
+        aggr_portf['p_value'] = aggr_portf.apply(chi_sqr_test, axis=1, args=(group_counts,))
+        # фильтруем по p-value
+        aggr_portf = aggr_portf.loc[aggr_portf.p_value < 0.2, :]
+
+        aggr_portf['stat_significance'] = (1 - aggr_portf.p_value) * 100
+        aggr_portf = aggr_portf.drop(columns=['p_value', ])
+    else:
+        aggr_portf['stat_significance'] = np.nan
+
     # считаем доли относительно изначальной выборки
     aggr_portf.loc[:, ['request_clients_ratio', 'other_clients_ratio']] /= group_counts
-    aggr_portf['stat_significance'] = (1 - aggr_portf.p_value) * 100
-    aggr_portf = aggr_portf.drop(columns=['p_value',])
+
     return aggr_portf
 
-def avg_aggr_statictcs(aggr_portf):
+def avg_aggr_statictcs(aggr_portf, with_tests=True):
     aggr_portf = aggr_portf.transpose()
     aggr_portf = aggr_portf.unstack()
     aggr_portf = aggr_portf.dropna(axis=0, how='any')
@@ -216,21 +222,25 @@ def avg_aggr_statictcs(aggr_portf):
     aggr_portf = aggr_portf.loc[:, ['request_clients_mean', 'other_clients_mean', 'request_clients_std',
                                                     'other_clients_std', 'request_clients_cnt', 'other_clients_cnt']]
 
-    aggr_portf['f_test_pvalue'] = aggr_portf.loc[:, ['request_clients_std', 'other_clients_std',
+    if with_tests:
+        aggr_portf['f_test_pvalue'] = aggr_portf.loc[:, ['request_clients_std', 'other_clients_std',
                                                     'request_clients_cnt', 'other_clients_cnt']].apply(f_test, axis=1)
-    aggr_portf['t_test_pvalue'] = aggr_portf.loc[:, ['request_clients_mean', 'other_clients_mean',
-                                                'request_clients_std', 'other_clients_std', 'request_clients_cnt',
-                                                'other_clients_cnt', 'f_test_pvalue']].apply(t_test, axis=1)
-    aggr_portf['comment'] = aggr_portf.loc[:, ['request_clients_std', 'other_clients_std',
-                                    'request_clients_cnt', 'other_clients_cnt', 'f_test_pvalue']].apply(comment_variance)
-
-    aggr_portf = aggr_portf.loc[aggr_portf.t_test_pvalue < 0.2, ['request_clients_mean', 'other_clients_mean',
-                                                                't_test_pvalue', 'comment']]
-    aggr_portf['stat_significance'] = (1 - aggr_portf.t_test_pvalue) * 100
-    aggr_portf = aggr_portf.drop(columns=['t_test_pvalue',])
+        aggr_portf['t_test_pvalue'] = aggr_portf.loc[:, ['request_clients_mean', 'other_clients_mean',
+                                                    'request_clients_std', 'other_clients_std', 'request_clients_cnt',
+                                                    'other_clients_cnt', 'f_test_pvalue']].apply(t_test, axis=1)
+        aggr_portf['comment'] = aggr_portf.loc[:, ['request_clients_std', 'other_clients_std', 'request_clients_cnt',
+                                                   'other_clients_cnt', 'f_test_pvalue']].apply(comment_variance)
+        # фильтруем по p-value
+        aggr_portf = aggr_portf.loc[aggr_portf.t_test_pvalue < 0.2, ['request_clients_mean', 'other_clients_mean',
+                                                                        't_test_pvalue', 'comment']]
+        aggr_portf['stat_significance'] = (1 - aggr_portf.t_test_pvalue) * 100
+        aggr_portf = aggr_portf.drop(columns=['t_test_pvalue',])
+    else:
+        aggr_portf['stat_significance'] = np.nan
+        aggr_portf['comment'] = np.nan
     return aggr_portf
 
-def okved_aggr_statistics(aggr_portf, group_counts):
+def okved_aggr_statistics(aggr_portf, group_counts, with_tests=True):
     aggr_portf = aggr_portf.unstack().transpose()
     aggr_portf = aggr_portf.fillna(0.0)
     aggr_portf.columns.name = None
@@ -238,30 +248,32 @@ def okved_aggr_statistics(aggr_portf, group_counts):
     aggr_portf = aggr_portf.loc[:, ['request_clients_ratio', 'other_clients_ratio']]
     # отбираем те ОКВЭД, по которым кол-во клиентов больше 30
     aggr_portf = aggr_portf.loc[(aggr_portf.request_clients_ratio >= 30) & (aggr_portf.other_clients_ratio >= 30),:]
-    
-    if aggr_portf.shape[0] > 0:
+
+    if with_tests and aggr_portf.shape[0] > 0:
         aggr_portf['p_value'] = aggr_portf.apply(chi_sqr_test, axis=1, args=(group_counts,))
     else:
-        aggr_portf['p_value'] = aggr_portf.request_clients_ratio
-            
+        aggr_portf['p_value'] = np.nan
+
     # считаем доли относительно изначальной выборки
     aggr_portf.loc[:, ['request_clients_ratio', 'other_clients_ratio']] /= group_counts
-    
     aggr_portf['ratio'] = aggr_portf.request_clients_ratio / aggr_portf.other_clients_ratio
 
     # оставляем только топ 5 ОКВЭД по отношению
     aggr_portf = aggr_portf.sort_values(by='ratio', ascending=False)
     aggr_portf = aggr_portf.iloc[:5, :]
-    
-    # фильтруем по p-value
-    aggr_portf = aggr_portf.loc[aggr_portf.p_value < 0.2, :]
-    
-    aggr_portf['stat_significance'] = (1 - aggr_portf.p_value) * 100
-    aggr_portf = aggr_portf.drop(columns=['p_value',])
+
+    if with_tests:
+        # фильтруем по p-value
+        aggr_portf = aggr_portf.loc[aggr_portf.p_value < 0.2, :]
+        aggr_portf['stat_significance'] = (1 - aggr_portf.p_value) * 100
+    else:
+        aggr_portf['stat_significance'] = np.nan
+
+    aggr_portf = aggr_portf.drop(columns=['p_value', ])
     aggr_portf.index = 'Доля клиентов с ОКВЭД ' + aggr_portf.index
     return aggr_portf
 
-def city_aggr_statistics(aggr_portf, group_counts):
+def city_aggr_statistics(aggr_portf, group_counts, with_tests=True):
     aggr_portf = aggr_portf.unstack().transpose()
     aggr_portf = aggr_portf.fillna(0.0)
     aggr_portf.columns.name = None
@@ -269,30 +281,34 @@ def city_aggr_statistics(aggr_portf, group_counts):
     aggr_portf = aggr_portf.loc[:, ['request_clients_ratio', 'other_clients_ratio']]
     # отбираем те города, по которым кол-во клиентов больше 30
     aggr_portf = aggr_portf.loc[(aggr_portf.request_clients_ratio >= 30) & (aggr_portf.other_clients_ratio >= 30),:]
-    
-    if aggr_portf.shape[0] > 0:
+
+    if with_tests and aggr_portf.shape[0] > 0:
         aggr_portf['p_value'] = aggr_portf.apply(chi_sqr_test, axis=1, args=(group_counts,))
     else:
-        aggr_portf['p_value'] = aggr_portf.request_clients_ratio
-            
+        aggr_portf['p_value'] = np.nan
+
     # считаем доли относительно изначальной выборки
     aggr_portf.loc[:, ['request_clients_ratio', 'other_clients_ratio']] /= group_counts
-    
     aggr_portf['ratio'] = aggr_portf.request_clients_ratio / aggr_portf.other_clients_ratio
 
     # оставляем только топ 5 городов по отношению
     aggr_portf = aggr_portf.sort_values(by='ratio', ascending=False)
     aggr_portf = aggr_portf.iloc[:5, :]
-    
-    # фильтруем по p-value
-    aggr_portf = aggr_portf.loc[aggr_portf.p_value < 0.2, :]
-    
-    aggr_portf['stat_significance'] = (1 - aggr_portf.p_value) * 100
-    aggr_portf = aggr_portf.drop(columns=['p_value',])
+
+    if with_tests:
+        # фильтруем по p-value
+        aggr_portf = aggr_portf.loc[aggr_portf.p_value < 0.2, :]
+        aggr_portf['stat_significance'] = (1 - aggr_portf.p_value) * 100
+    else:
+        aggr_portf['stat_significance'] = np.nan
+
+    aggr_portf = aggr_portf.drop(columns=['p_value', ])
     aggr_portf.index = 'Доля г. ' + aggr_portf.index
     return aggr_portf
 
 def make_portf_cmp_report(filename, only_active=False, other_clients_filename=None):
+    tests_flag = True
+
     sql_query = f"""
                     select *
                         from {POTRFOLIO_TABLE} t
@@ -330,12 +346,20 @@ def make_portf_cmp_report(filename, only_active=False, other_clients_filename=No
 
     # Маркируем клиентов в портрете на принадлежность к выборке
     portf['req_client'] = portf.client_key.isin(request_clients.client_key)
+    req_portf = portf.loc[portf.req_client, :]
 
     # Выбираем с какой группой будем сравнивать
     if only_active:
-        portf = portf.loc[portf.req_client | (portf.active == 1), :]
+        oth_portf = portf.loc[(~portf.req_client) & (portf.active == 1), :]
     elif other_clients_filename is not None:
-        portf = portf.loc[portf.req_client | portf.client_key.isin(other_clients.client_key), :]
+        oth_portf = portf.loc[portf.client_key.isin(other_clients.client_key), :]
+        oth_portf.req_client = False
+        if req_portf.client_key.isin(oth_portf.client_key).sum() > 0:
+            tests_flag = False
+    else:
+        oth_portf = portf.loc[~portf.req_client, :]
+
+    portf = pd.concat([req_portf, oth_portf], axis=0, ignore_index=True)
 
     all_cols = group_col + cols_count_aggr + cols_ratio_aggr + cols_ratio_notnull_aggr + ie_ratio_aggr + cols_avg_aggr\
                                 + cols_distr_aggr
@@ -358,16 +382,16 @@ def make_portf_cmp_report(filename, only_active=False, other_clients_filename=No
     counts = count_aggr_portf.loc['count', ['request_clients', 'other_clients']].values
 
     # Считаем статистики для доли клиентов в выборке
-    report_ratio = ratio_aggr_statictcs(ratio_aggr_portf, counts)
+    report_ratio = ratio_aggr_statictcs(ratio_aggr_portf, counts, tests_flag)
 
     # Считаем статистики для числовых показателей выборки
-    avg_report = avg_aggr_statictcs(avg_std_aggr_portf)
+    avg_report = avg_aggr_statictcs(avg_std_aggr_portf, tests_flag)
     
     # Считаем статистики для ОКВЭД выборки
-    okved_report = okved_aggr_statistics(okved_aggr_portf, counts)
+    okved_report = okved_aggr_statistics(okved_aggr_portf, counts, tests_flag)
     
     # Считаем статистики для городов выборки
-    city_report = city_aggr_statistics(city_aggr_portf, counts)
+    city_report = city_aggr_statistics(city_aggr_portf, counts, tests_flag)
 
     # Таблица с долями клиентов среди/вне выборки
     report_ratio = report_ratio.rename(columns={'request_clients_ratio': request_cl_col_name,
