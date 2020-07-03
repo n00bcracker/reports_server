@@ -34,30 +34,34 @@
         <a href={{proccesed_file}}>Файл с результами</a><br><br><br>
         <a href>Обработать еще файл.</a>
     {% else %}
-        <p>
-            Выберите группу с которой будет производится сравнение
-            <select required name="cmp_group" form="upload_file">
-                <option selected disabled>Выберите группу</option>
-                <option value="all">все</option>
-                <option value="active">только активные</option>
-                <option value="other">своя выборка</option>
-            </select>
-        </p>
-        <p>Своя выборка: <input type="file" name="other_cl_file" form="upload_file"></p>
-        {% if errors['other_file_error'] is not none %}
-            <p style="color: red; ">{{errors['other_file_error']}}</p>
-        {% endif %}
-
-{#        <p>Загрузите список клиентов банка в формате <a href="./meta/Шаблон запроса.xlsx">шаблона</a>.</p>#}
-        <p>Загрузите excel-файл с клиентами в формате, где 1-й столбец - ИНН, 2-й столбец - КПП, 3-й столбец - client_key (инн_кпп), 4-й - id (из портрета клиента) - без заголовков, только данные в нужных столбцах.</p>
-        <p style="color: red; ">Хотя один из столбцов (1-й, 3-й, 4-й) обязателен для заполнения.</p>
         <form id='upload_file' method="POST" enctype="multipart/form-data">
-            <p>Файл с клиентами: <input type="file" name="requested_cl_file">
-            <button type="submit">Загрузить</button></p>
-        </form>
-        {% if errors['request_file_error'] is not none %}
-            <p style="color: red; ">{{errors['request_file_error']}}</p>
-        {% endif %}<br><br>
+            <p>Шаг 1. Выберите подготовленный excel-файл с клиентами для анализа, где <br>
+                1-й столбец - ИНН <br>
+                2-й столбец - КПП <br>
+                3-й столбец - client_key (инн_кпп) <br>
+                4-й столбец - id (из портрета клиента)
+            </p>
+            <p style="color: red; ">!!!ВАЖНО!!! в файле должны быть только данные без заголовков. Хотя один из столбцов (1-й, 3-й, 4-й) обязателен для заполнения.</p>
+            <input type="file" name="requested_cl_file">
+            {% if errors['request_file_error'] is not none %}
+                <br><span style="color: red; ">{{errors['request_file_error']}}</span>
+            {% endif %}<br><br>
+            <p>Шаг 2. Выберите референсную группу (с которой будет производится сравнение)
+                <select required name="cmp_group">
+                    <option selected disabled>Выберите группу</option>
+                    <option value="all">все</option>
+                    <option value="active">только активные</option>
+                    <option value="other">своя выборка</option>
+                </select>
+            </p>
+            <p>Если выбрали опцию "своя выборка", то <input type="file" name="other_cl_file">
+            {% if errors['other_file_error'] is not none %}
+                <br><span style="color: red; ">{{errors['other_file_error']}}</span>
+            {% endif %}
+            </p><br><br>
+            <p>Шаг 3. Выберите уровень значимости для проверки гипотез: <input name="sign_level" type="number" size="1" max="100" min="0" value="80">%</p>
+            <p>Шаг 4. Для запуска анализа нажмите <button type="submit">Пуск</button></p>
+        </form><br><br>
         <p style="color: darkorange; ">Из-за высокой загруженности сервера время обработки файла может занимать до 10 минут.</p>
     {% endif %}
 </body>
