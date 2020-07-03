@@ -33,12 +33,14 @@ def upload_clients_sample():
                 rq_filename = os.path.join(app.config['UPLOAD_FOLDER'], filename)
                 file.save(rq_filename)
 
+                sign_level = request.form.get('sign_level')
+
                 try:
                     group = request.form.get('cmp_group')
                     if group == 'active':
-                        proccesed_file = make_portf_cmp_report(rq_filename, only_active=True)
+                        proccesed_file = make_portf_cmp_report(rq_filename, sign_level=sign_level, only_active=True)
                     elif group == 'all':
-                        proccesed_file = make_portf_cmp_report(rq_filename, only_active=False)
+                        proccesed_file = make_portf_cmp_report(rq_filename, sign_level=sign_level)
                     elif group == 'other':
                         file = request.files['other_cl_file']
                         if file.filename == '':
@@ -54,7 +56,8 @@ def upload_clients_sample():
                                 oth_filename = os.path.join(app.config['UPLOAD_FOLDER'], filename)
                                 file.save(oth_filename)
 
-                                proccesed_file = make_portf_cmp_report(rq_filename, other_clients_filename=oth_filename)
+                                proccesed_file = make_portf_cmp_report(rq_filename, sign_level=sign_level,\
+                                                                        other_clients_filename=oth_filename)
                 except NotValidClients as e:
                     if e.file_id == 'requested_cl_file':
                         errors['request_file_error'] = e.message
