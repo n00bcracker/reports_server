@@ -34,6 +34,7 @@ def upload_clients_sample():
                 file.save(rq_filename)
 
                 sign_level = request.form.get('sign_level')
+                sign_level = float(sign_level)
 
                 try:
                     group = request.form.get('cmp_group')
