@@ -28,7 +28,7 @@ cols_ratio_aggr = ['active', 'is_current', 'block_ufm', 'tax_restrictions', 'sp_
                     'tendency_acquiring_products', 'tendency_corporate_card', 'tendency_client_escape',
                     'tendency_comp_liq', 'down_active_model', 'giving_out_loan', 'receiving_loan', 'in_transfer_own_money',
                     'out_transfer_own_money',  'pay_salary', 'increase_capital', 'decrease_capital', 'sale_share', 
-                    'black_sale', 'covid_19',]
+                    'black_sale', 'covid_19', 'escape_rko',]
 cols_ratio_notnull_aggr = ['business_liquidation_date', 'sup_manager', 'group_id', 'other_bank_name',]
 ie_ratio_aggr = ['ip_ul',]
 cols_avg_aggr = ['life_span_in_bank', 'life_span_business', 'revenue', 'coowner_cnt', 'cnt_aff_comp', 'amount_dvs', 
@@ -37,12 +37,15 @@ cols_avg_aggr = ['life_span_in_bank', 'life_span_business', 'revenue', 'coowner_
                     'cash_withdrawal_amount', 'cash_input_amount', 'cash_withdrawal_atm', 'cash_input_atm',
                     'cash_withdrawal_adm', 'commission_income', 'avg_commis_income_3m', 'revenue_mod', 'revenue_calc',
                     'sum_revenue_group', 'count_company_in_group', 'count_company_clients_bank', 'cnt_employees',
-                    'num_out_trans_all_life', 'num_contr', 'life_time_mod', 'ltv_rur', 'wallet_share',]
-cols_distr_aggr = ['okved_main', 'hub_city', 'activ_area',]
+                    'num_out_trans_all_life', 'num_contr', 'life_time_mod', 'ltv_rur', 'wallet_share', 'cash_inkass',
+                    'card_purchases', 'wallet_potential',]
+cols_distr_aggr = ['okved_main', 'activ_area', 'hub_city', 'attraction_channel', 'cl_status_pay', ]
 
 request_cl_col_name = 'Знач. показателя для клиентов из выборки'
 other_cl_col_name = 'Знач. показателя для остальных клиентов'
 stat_col_name = 'Уровень достоверности отличия, %'
+ratio_col_name = 'Соотношение'
+comment_col_name = 'Комментарий'
 
 
 def decipher_inn(inn_cipher):
@@ -213,7 +216,7 @@ def ratio_aggr_statictcs(aggr_portf, group_counts, with_tests=True, sign_level =
         aggr_portf = aggr_portf.drop(columns=['p_value', ])
 
         # фильтруем по уровню значимости
-        aggr_portf = aggr_portf.loc[aggr_portf.stat_significance > sign_level, :]
+        aggr_portf = aggr_portf.loc[aggr_portf.stat_significance >= sign_level, :]
     else:
         aggr_portf['stat_significance'] = np.nan
 
@@ -244,19 +247,19 @@ def avg_aggr_statictcs(aggr_portf, with_tests=True, sign_level = 80):
                                                     'other_clients_std', 'request_clients_cnt', 'other_clients_cnt'])
 
         # фильтруем по уровню значимости
-        aggr_portf = aggr_portf.loc[aggr_portf.stat_significance > sign_level, :]
+        aggr_portf = aggr_portf.loc[aggr_portf.stat_significance >= sign_level, :]
     else:
         aggr_portf['stat_significance'] = np.nan
         aggr_portf['comment'] = np.nan
     return aggr_portf
 
-def okved_aggr_statistics(aggr_portf, group_counts, with_tests=True, sign_level = 80):
+def distr_aggr_statistics(aggr_portf, group_counts, with_tests=True, sign_level = 80):
     aggr_portf = aggr_portf.unstack().transpose()
     aggr_portf = aggr_portf.fillna(0.0)
     aggr_portf.columns.name = None
     aggr_portf = aggr_portf.rename(columns={True : 'request_clients_ratio', False : 'other_clients_ratio'})
     aggr_portf = aggr_portf.loc[:, ['request_clients_ratio', 'other_clients_ratio']]
-    # отбираем те ОКВЭД, по которым кол-во клиентов больше 30
+    # отбираем те значения поля, с которыми кол-во клиентов больше 30
     aggr_portf = aggr_portf.loc[(aggr_portf.request_clients_ratio >= 30) & (aggr_portf.other_clients_ratio >= 30),:]
 
     if with_tests and aggr_portf.shape[0] > 0:
@@ -270,78 +273,26 @@ def okved_aggr_statistics(aggr_portf, group_counts, with_tests=True, sign_level 
     aggr_portf.loc[:, ['request_clients_ratio', 'other_clients_ratio']] /= group_counts
     aggr_portf['ratio'] = aggr_portf.request_clients_ratio / aggr_portf.other_clients_ratio
 
-    # оставляем только топ 5 ОКВЭД по отношению
+    # оставляем только топ 5 значений по отношению
     aggr_portf = aggr_portf.sort_values(by='ratio', ascending=False)
     aggr_portf = aggr_portf.iloc[:5, :]
 
     if with_tests:
         # фильтруем по уровню значимости
-        aggr_portf = aggr_portf.loc[aggr_portf.stat_significance > sign_level, :]
-
-    aggr_portf.index = 'Доля клиентов с ОКВЭД ' + aggr_portf.index
+        aggr_portf = aggr_portf.loc[aggr_portf.stat_significance >= sign_level, :]
+                          
     return aggr_portf
 
-def activ_area_aggr_statistics(aggr_portf, group_counts, with_tests=True, sign_level = 80):
-    aggr_portf = aggr_portf.unstack().transpose()
-    aggr_portf = aggr_portf.fillna(0.0)
-    aggr_portf.columns.name = None
-    aggr_portf = aggr_portf.rename(columns={True : 'request_clients_ratio', False : 'other_clients_ratio'})
-    aggr_portf = aggr_portf.loc[:, ['request_clients_ratio', 'other_clients_ratio']]
-    # отбираем те ОКВЭД, по которым кол-во клиентов больше 30
-    aggr_portf = aggr_portf.loc[(aggr_portf.request_clients_ratio >= 30) & (aggr_portf.other_clients_ratio >= 30),:]
-
-    if with_tests and aggr_portf.shape[0] > 0:
-        aggr_portf['p_value'] = aggr_portf.apply(chi_sqr_test, axis=1, args=(group_counts,))
-        aggr_portf['stat_significance'] = (1 - aggr_portf.p_value) * 100
-        aggr_portf = aggr_portf.drop(columns=['p_value', ])
-    else:
-        aggr_portf['stat_significance'] = np.nan
-
-    # считаем доли относительно изначальной выборки
-    aggr_portf.loc[:, ['request_clients_ratio', 'other_clients_ratio']] /= group_counts
-    aggr_portf['ratio'] = aggr_portf.request_clients_ratio / aggr_portf.other_clients_ratio
-
-    # оставляем только топ 5 ОКВЭД по отношению
-    aggr_portf = aggr_portf.sort_values(by='ratio', ascending=False)
-    aggr_portf = aggr_portf.iloc[:5, :]
-
-    if with_tests:
-        # фильтруем по уровню значимости
-        aggr_portf = aggr_portf.loc[aggr_portf.stat_significance > sign_level, :]
-
-    aggr_portf.index = 'Доля клиентов с группой ОКВЭД ' + aggr_portf.index
-    return aggr_portf
-
-def city_aggr_statistics(aggr_portf, group_counts, with_tests=True, sign_level = 80):
-    aggr_portf = aggr_portf.unstack().transpose()
-    aggr_portf = aggr_portf.fillna(0.0)
-    aggr_portf.columns.name = None
-    aggr_portf = aggr_portf.rename(columns={True : 'request_clients_ratio', False : 'other_clients_ratio'})
-    aggr_portf = aggr_portf.loc[:, ['request_clients_ratio', 'other_clients_ratio']]
-    # отбираем те города, по которым кол-во клиентов больше 30
-    aggr_portf = aggr_portf.loc[(aggr_portf.request_clients_ratio >= 30) & (aggr_portf.other_clients_ratio >= 30),:]
-
-    if with_tests and aggr_portf.shape[0] > 0:
-        aggr_portf['p_value'] = aggr_portf.apply(chi_sqr_test, axis=1, args=(group_counts,))
-        aggr_portf['stat_significance'] = (1 - aggr_portf.p_value) * 100
-        aggr_portf = aggr_portf.drop(columns=['p_value', ])
-    else:
-        aggr_portf['stat_significance'] = np.nan
-
-    # считаем доли относительно изначальной выборки
-    aggr_portf.loc[:, ['request_clients_ratio', 'other_clients_ratio']] /= group_counts
-    aggr_portf['ratio'] = aggr_portf.request_clients_ratio / aggr_portf.other_clients_ratio
-
-    # оставляем только топ 5 городов по отношению
-    aggr_portf = aggr_portf.sort_values(by='ratio', ascending=False)
-    aggr_portf = aggr_portf.iloc[:5, :]
-
-    if with_tests:
-        # фильтруем по уровню значимости
-        aggr_portf = aggr_portf.loc[aggr_portf.stat_significance > sign_level, :]
-
-    aggr_portf.index = 'Доля г. ' + aggr_portf.index
-    return aggr_portf
+def translate_cols_names(report):
+    report = report.rename(columns={'request_clients_ratio' : request_cl_col_name,
+                                    'other_clients_ratio' : other_cl_col_name,
+                                    'request_clients_mean' : request_cl_col_name,
+                                    'other_clients_mean' : other_cl_col_name,
+                                    'stat_significance' : stat_col_name,
+                                    'ratio' : ratio_col_name,
+                                    'comment' : comment_col_name,
+                                   })
+    return report
 
 def make_portf_cmp_report(filename, sign_level=80, only_active=False, other_clients_filename=None):
     tests_flag = True
@@ -412,6 +363,8 @@ def make_portf_cmp_report(filename, sign_level=80, only_active=False, other_clie
     okved_aggr_portf = portf.groupby(by=group_col+['okved_main',]).size()
     activ_area_aggr_portf = portf.groupby(by=group_col+['activ_area',]).size()
     city_aggr_portf = portf.groupby(by=group_col+['hub_city',]).size()
+    chan_aggr_portf = portf.groupby(by=group_col+['attraction_channel',]).size()
+    pay_behav_aggr_portf = portf.groupby(by=group_col+['cl_status_pay',]).size()
 
     count_aggr_portf = count_aggr_portf.transpose()
     count_aggr_portf.columns.name = None
@@ -427,48 +380,44 @@ def make_portf_cmp_report(filename, sign_level=80, only_active=False, other_clie
     avg_report = avg_aggr_statictcs(avg_std_aggr_portf, tests_flag, sign_level=sign_level)
     
     # Считаем статистики для ОКВЭД выборки
-    okved_report = okved_aggr_statistics(okved_aggr_portf, counts, tests_flag, sign_level=sign_level)
-    
+    okved_report = distr_aggr_statistics(okved_aggr_portf, counts, tests_flag, sign_level=sign_level)
+    okved_report.index = 'Доля клиентов с ОКВЭД ' + okved_report.index
+
     # Считаем статистики для группы ОКВЭД выборки
-    activ_area_report = activ_area_aggr_statistics(activ_area_aggr_portf, counts, tests_flag, sign_level=sign_level)
-    
+    activ_area_report = distr_aggr_statistics(activ_area_aggr_portf, counts, tests_flag, sign_level=sign_level)
+    activ_area_report.index = 'Доля клиентов с группой ОКВЭД ' + activ_area_report.index
+
     # Считаем статистики для городов выборки
-    city_report = city_aggr_statistics(city_aggr_portf, counts, tests_flag, sign_level=sign_level)
+    city_report = distr_aggr_statistics(city_aggr_portf, counts, tests_flag, sign_level=sign_level)
+    city_report.index = 'Доля г. ' + city_report.index
+
+    # Считаем статистики для каналов привлечения
+    chan_report = distr_aggr_statistics(chan_aggr_portf, counts, tests_flag, sign_level=sign_level)
+    chan_report.index = 'Доля канала привлечения ' + chan_report.index
+
+    # Считаем статистики для платежного поведения
+    pay_behav_report = distr_aggr_statistics(pay_behav_aggr_portf, counts, tests_flag, sign_level=sign_level)
+    pay_behav_report.index = 'Доля клиентов с типом поведения ' + pay_behav_report.index
 
     # Таблица с долями клиентов среди/вне выборки
-    report_ratio = report_ratio.rename(columns={'request_clients_ratio': request_cl_col_name,
-                                                'other_clients_ratio': other_cl_col_name,
-                                                'stat_significance': stat_col_name})
-
+    report_ratio = translate_cols_names(report_ratio)
     # Таблица со средним по показателям клиентов среди/вне выборки
-    avg_report = avg_report.rename(columns={'request_clients_mean': request_cl_col_name,
-                                            'other_clients_mean': other_cl_col_name,
-                                            'stat_significance': stat_col_name,
-                                            'comment': 'Комментарий'})
-    
-    # Таблица со долями клиентов по ОКВЭД
-    okved_report = okved_report.rename(columns={'request_clients_ratio' : request_cl_col_name,
-                                                'other_clients_ratio' : other_cl_col_name,
-                                                'stat_significance' : stat_col_name,
-                                                'ratio' : 'Соотношение'})
-    
-    # Таблица со долями клиентов по группам ОКВЭД
-    activ_area_report = activ_area_report.rename(columns={'request_clients_ratio' : request_cl_col_name,
-                                                'other_clients_ratio' : other_cl_col_name,
-                                                'stat_significance' : stat_col_name,
-                                                'ratio' : 'Соотношение'})
-    
-    # Таблица со долями клиентов по городам
-    city_report = city_report.rename(columns={'request_clients_ratio' : request_cl_col_name,
-                                                'other_clients_ratio' : other_cl_col_name,
-                                                'stat_significance' : stat_col_name,
-                                                'ratio' : 'Соотношение'})
+    avg_report = translate_cols_names(avg_report)
+    # Таблица со долями клиентов по ОКВЭД среди/вне выборки
+    okved_report = translate_cols_names(okved_report)
+    # Таблица со долями клиентов по группам ОКВЭД среди/вне выборки
+    activ_area_report = translate_cols_names(activ_area_report)
+    # Таблица со долями клиентов по городам среди/вне выборки
+    city_report = translate_cols_names(city_report)
+    # Таблица со долями клиентов по каналам среди/вне выборки
+    chan_report = translate_cols_names(chan_report)
+    # Таблица со долями клиентов по каналам среди/вне выборки
+    pay_behav_report = translate_cols_names(pay_behav_report)
 
     report = pd.concat([report_ratio, avg_report])
     report['Соотношение'] = report.loc[:, request_cl_col_name] / report.loc[:, other_cl_col_name]
     report = report.loc[:, [request_cl_col_name, other_cl_col_name, 'Соотношение', stat_col_name, 'Комментарий']]
-    report = pd.concat([report, okved_report, activ_area_report, city_report])
-    
+    report = pd.concat([report, okved_report, activ_area_report, city_report, chan_report])
     report = report.sort_values('Соотношение', ascending=False)
 
     count_aggr_portf = count_aggr_portf.rename(columns={'request_clients': request_cl_col_name,
@@ -479,8 +428,8 @@ def make_portf_cmp_report(filename, sign_level=80, only_active=False, other_clie
 
     # Форматирование
     ratio_idx_names = cols_ratio_aggr + cols_ratio_notnull_aggr + ie_ratio_aggr + list(okved_report.index)\
-                                        + list(activ_area_report.index) + list(city_report.index)
-    
+                                       + list(activ_area_report.index) + list(city_report.index) + list(chan_report.index)\
+                                       + list(pay_behav_report.index)
     cond = report.index.isin(ratio_idx_names)
     report.loc[cond, [request_cl_col_name, other_cl_col_name]] =\
                                                     report.loc[cond, [request_cl_col_name, other_cl_col_name]].round(3)
@@ -494,7 +443,7 @@ def make_portf_cmp_report(filename, sign_level=80, only_active=False, other_clie
     amt_idx_names = ['amount_dvs', 'amount_dvs_mid', 'amount_deposit', 'amount_nso', 'amt_transactions_per_month',
                      'cash_withdrawal_amount', 'cash_input_amount', 'cash_withdrawal_atm', 'cash_input_atm',
                      'cash_withdrawal_adm', 'avg_commis_income_3m', 'commission_income', 'ltv_rur', 'revenue',
-                     'revenue_mod', 'revenue_calc', 'sum_revenue_group']
+                     'revenue_mod', 'revenue_calc', 'sum_revenue_group', 'cash_inkass', 'card_purchases',]
     cond = report.index.isin(amt_idx_names)
     report.loc[cond, [request_cl_col_name, other_cl_col_name]] = report.loc[cond,\
                                                                     [request_cl_col_name, other_cl_col_name]].round(0)
