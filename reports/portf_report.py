@@ -411,13 +411,13 @@ def make_portf_cmp_report(filename, sign_level=80, only_active=False, other_clie
     city_report = translate_cols_names(city_report)
     # Таблица со долями клиентов по каналам среди/вне выборки
     chan_report = translate_cols_names(chan_report)
-    # Таблица со долями клиентов по каналам среди/вне выборки
+    # Таблица со долями клиентов по плат. поведению среди/вне выборки
     pay_behav_report = translate_cols_names(pay_behav_report)
 
     report = pd.concat([report_ratio, avg_report])
     report['Соотношение'] = report.loc[:, request_cl_col_name] / report.loc[:, other_cl_col_name]
     report = report.loc[:, [request_cl_col_name, other_cl_col_name, 'Соотношение', stat_col_name, 'Комментарий']]
-    report = pd.concat([report, okved_report, activ_area_report, city_report, chan_report])
+    report = pd.concat([report, okved_report, activ_area_report, city_report, chan_report, pay_behav_report])
     report = report.sort_values('Соотношение', ascending=False)
 
     count_aggr_portf = count_aggr_portf.rename(columns={'request_clients': request_cl_col_name,
