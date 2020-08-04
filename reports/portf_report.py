@@ -230,9 +230,9 @@ def avg_aggr_statictcs(aggr_portf, with_tests=True, sign_level = 80):
     aggr_portf = aggr_portf.unstack()
     aggr_portf = aggr_portf.dropna(axis=0, how='any')
     aggr_portf.columns = ['other_clients_mean', 'other_clients_std', 'other_clients_cnt', 'request_clients_mean',
-                                    'request_clients_std', 'request_clients_cnt']
+                                        'request_clients_std', 'request_clients_cnt']
     aggr_portf = aggr_portf.loc[:, ['request_clients_mean', 'other_clients_mean', 'request_clients_std',
-                                                    'other_clients_std', 'request_clients_cnt', 'other_clients_cnt']]
+                                        'other_clients_std', 'request_clients_cnt', 'other_clients_cnt']]
 
     if with_tests:
         aggr_portf['f_test_pvalue'] = aggr_portf.loc[:, ['request_clients_std', 'other_clients_std',
@@ -241,7 +241,7 @@ def avg_aggr_statictcs(aggr_portf, with_tests=True, sign_level = 80):
                                                     'request_clients_std', 'other_clients_std', 'request_clients_cnt',
                                                     'other_clients_cnt', 'f_test_pvalue']].apply(t_test, axis=1)
         aggr_portf['comment'] = aggr_portf.loc[:, ['request_clients_std', 'other_clients_std', 'request_clients_cnt',
-                                                   'other_clients_cnt', 'f_test_pvalue']].apply(comment_variance)
+                                                    'other_clients_cnt', 'f_test_pvalue']].apply(comment_variance)
         aggr_portf['stat_significance'] = (1 - aggr_portf.t_test_pvalue) * 100
         aggr_portf = aggr_portf.drop(columns=['f_test_pvalue', 't_test_pvalue', 'request_clients_std',
                                                     'other_clients_std', 'request_clients_cnt', 'other_clients_cnt'])
@@ -428,8 +428,8 @@ def make_portf_cmp_report(filename, sign_level=80, only_active=False, other_clie
 
     # Форматирование
     ratio_idx_names = cols_ratio_aggr + cols_ratio_notnull_aggr + ie_ratio_aggr + list(okved_report.index)\
-                                       + list(activ_area_report.index) + list(city_report.index) + list(chan_report.index)\
-                                       + list(pay_behav_report.index)
+                                + list(activ_area_report.index) + list(city_report.index) + list(chan_report.index)\
+                                + list(pay_behav_report.index)
     cond = report.index.isin(ratio_idx_names)
     report.loc[cond, [request_cl_col_name, other_cl_col_name]] =\
                                                     report.loc[cond, [request_cl_col_name, other_cl_col_name]].round(3)
