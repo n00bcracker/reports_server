@@ -39,6 +39,10 @@ cols_avg_aggr = ['life_span_in_bank', 'life_span_business', 'revenue', 'coowner_
                     'sum_revenue_group', 'count_company_in_group', 'count_company_clients_bank', 'cnt_employees',
                     'num_out_trans_all_life', 'num_contr', 'life_time_mod', 'ltv_rur', 'wallet_share', 'cash_inkass',
                     'card_purchases', 'wallet_potential',]
+cols_med_aggr = ['revenue', 'amount_dvs', 'amount_dvs_mid', 'amount_deposit', 'amount_nso', 'amt_transactions_per_month',
+                'cnt_in_transactions_per_month', 'cash_withdrawal_amount', 'cash_input_amount', 'cash_withdrawal_atm',
+                'cash_input_atm', 'cash_withdrawal_adm', 'commission_income', 'avg_commis_income_3m', 'revenue_mod',
+                'revenue_calc', 'sum_revenue_group', 'ltv_rur', 'cash_inkass', 'card_purchases',]
 cols_distr_aggr = ['okved_main', 'activ_area', 'hub_city', 'attraction_channel', 'cl_status_pay', ]
 
 request_cl_col_name = 'Знач. показателя для клиентов из выборки'
@@ -204,7 +208,7 @@ def comment_variance(row):
         comment = np.nan
     return comment
 
-def ratio_aggr_statictcs(aggr_portf, group_counts, with_tests=True, sign_level = 80):
+def ratio_aggr_statistics(aggr_portf, group_counts, with_tests=True, sign_level = 80):
     aggr_portf = aggr_portf.transpose()
     aggr_portf.columns.name = None
     aggr_portf = aggr_portf.rename(columns={True : 'request_clients_ratio', False : 'other_clients_ratio'})
@@ -225,7 +229,7 @@ def ratio_aggr_statictcs(aggr_portf, group_counts, with_tests=True, sign_level =
 
     return aggr_portf
 
-def avg_aggr_statictcs(aggr_portf, with_tests=True, sign_level = 80):
+def avg_aggr_statistics(aggr_portf, with_tests=True, sign_level = 80):
     aggr_portf = aggr_portf.transpose()
     aggr_portf = aggr_portf.unstack()
     aggr_portf = aggr_portf.dropna(axis=0, how='any')
@@ -251,6 +255,19 @@ def avg_aggr_statictcs(aggr_portf, with_tests=True, sign_level = 80):
     else:
         aggr_portf['stat_significance'] = np.nan
         aggr_portf['comment'] = np.nan
+    return aggr_portf
+
+def med_aggr_statistics(aggr_portf):
+    aggr_portf = aggr_portf.transpose()
+    aggr_portf = aggr_portf.dropna(axis=0, how='any')
+    
+    aggr_portf.columns = ['other_clients_median', 'request_clients_median',]
+    aggr_portf = aggr_portf.loc[:, ['request_clients_median', 'other_clients_median',]]
+    aggr_portf['stat_significance'] = np.nan
+    aggr_portf['comment'] = np.nan
+    
+    aggr_portf.index = aggr_portf.index + '_med'
+    
     return aggr_portf
 
 def distr_aggr_statistics(aggr_portf, group_counts, with_tests=True, sign_level = 80):
@@ -288,6 +305,8 @@ def translate_cols_names(report):
                                     'other_clients_ratio' : other_cl_col_name,
                                     'request_clients_mean' : request_cl_col_name,
                                     'other_clients_mean' : other_cl_col_name,
+                                    'request_clients_median' : request_cl_col_name,
+                                    'other_clients_median' : other_cl_col_name,
                                     'stat_significance' : stat_col_name,
                                     'ratio' : ratio_col_name,
                                     'comment' : comment_col_name,
@@ -359,7 +378,9 @@ def make_portf_cmp_report(filename, sign_level=80, only_active=False, other_clie
 
     ratio_aggr_portf = gr_portf[cols_ratio_aggr + cols_ratio_notnull_aggr + ie_ratio_aggr].agg(np.sum)
     avg_std_aggr_portf = gr_portf[cols_avg_aggr].agg([np.mean, np.std, 'count'])
+    med_aggr_portf = gr_portf[cols_med_aggr].agg(np.median)
     count_aggr_portf = gr_portf[cols_count_aggr].agg('count')
+    
     okved_aggr_portf = portf.groupby(by=group_col+['okved_main',]).size()
     activ_area_aggr_portf = portf.groupby(by=group_col+['activ_area',]).size()
     city_aggr_portf = portf.groupby(by=group_col+['hub_city',]).size()
@@ -374,10 +395,13 @@ def make_portf_cmp_report(filename, sign_level=80, only_active=False, other_clie
     counts = count_aggr_portf.loc['count', ['request_clients', 'other_clients']].values
 
     # Считаем статистики для доли клиентов в выборке
-    report_ratio = ratio_aggr_statictcs(ratio_aggr_portf, counts, tests_flag, sign_level=sign_level)
+    report_ratio = ratio_aggr_statistics(ratio_aggr_portf, counts, tests_flag, sign_level=sign_level)
 
-    # Считаем статистики для числовых показателей выборки
-    avg_report = avg_aggr_statictcs(avg_std_aggr_portf, tests_flag, sign_level=sign_level)
+    # Считаем статистики для средних показателей выборки
+    avg_report = avg_aggr_statistics(avg_std_aggr_portf, tests_flag, sign_level=sign_level)
+
+    # Считаем статистики для средних показателей выборки
+    med_report = med_aggr_statistics(med_aggr_portf)
     
     # Считаем статистики для ОКВЭД выборки
     okved_report = distr_aggr_statistics(okved_aggr_portf, counts, tests_flag, sign_level=sign_level)
@@ -403,6 +427,8 @@ def make_portf_cmp_report(filename, sign_level=80, only_active=False, other_clie
     report_ratio = translate_cols_names(report_ratio)
     # Таблица со средним по показателям клиентов среди/вне выборки
     avg_report = translate_cols_names(avg_report)
+    # Таблица с медианами по показателям клиентов среди/вне выборки
+    med_report = translate_cols_names(med_report)
     # Таблица со долями клиентов по ОКВЭД среди/вне выборки
     okved_report = translate_cols_names(okved_report)
     # Таблица со долями клиентов по группам ОКВЭД среди/вне выборки
@@ -414,7 +440,7 @@ def make_portf_cmp_report(filename, sign_level=80, only_active=False, other_clie
     # Таблица со долями клиентов по плат. поведению среди/вне выборки
     pay_behav_report = translate_cols_names(pay_behav_report)
 
-    report = pd.concat([report_ratio, avg_report])
+    report = pd.concat([report_ratio, avg_report, med_report])
     report['Соотношение'] = report.loc[:, request_cl_col_name] / report.loc[:, other_cl_col_name]
     report = report.loc[:, [request_cl_col_name, other_cl_col_name, 'Соотношение', stat_col_name, 'Комментарий']]
     report = pd.concat([report, okved_report, activ_area_report, city_report, chan_report, pay_behav_report])
@@ -434,16 +460,17 @@ def make_portf_cmp_report(filename, sign_level=80, only_active=False, other_clie
     report.loc[cond, [request_cl_col_name, other_cl_col_name]] =\
                                                     report.loc[cond, [request_cl_col_name, other_cl_col_name]].round(3)
 
-    trns_cnt_idx_names = ['cnt_in_transactions_per_month', 'cnt_out_transactions_per_month',
-                                                        'cnt_transactions_in_month', 'num_out_trans_all_life']
+    trns_cnt_idx_names = ['cnt_out_transactions_per_month', 'cnt_transactions_in_month',
+                            'num_out_trans_all_life']
     cond = report.index.isin(trns_cnt_idx_names)
-    report.loc[cond, [request_cl_col_name, other_cl_col_name]] = report.loc[cond,\
-                                                                    [request_cl_col_name, other_cl_col_name]].round(1)
+    report.loc[cond, [request_cl_col_name, other_cl_col_name]] = \
+            report.loc[cond, [request_cl_col_name, other_cl_col_name]].round(1)
 
     amt_idx_names = ['amount_dvs', 'amount_dvs_mid', 'amount_deposit', 'amount_nso', 'amt_transactions_per_month',
-                     'cash_withdrawal_amount', 'cash_input_amount', 'cash_withdrawal_atm', 'cash_input_atm',
-                     'cash_withdrawal_adm', 'avg_commis_income_3m', 'commission_income', 'ltv_rur', 'revenue',
-                     'revenue_mod', 'revenue_calc', 'sum_revenue_group', 'cash_inkass', 'card_purchases',]
+        'cnt_in_transactions_per_month', 'cash_withdrawal_amount', 'cash_input_amount', 'cash_withdrawal_atm',
+        'cash_input_atm', 'cash_withdrawal_adm', 'avg_commis_income_3m', 'commission_income', 'ltv_rur', 'revenue',
+        'revenue_mod', 'revenue_calc', 'sum_revenue_group', 'cash_inkass', 'card_purchases',]
+    amt_idx_names += list(med_report.index)
     cond = report.index.isin(amt_idx_names)
     report.loc[cond, [request_cl_col_name, other_cl_col_name]] = report.loc[cond,\
                                                                     [request_cl_col_name, other_cl_col_name]].round(0)
