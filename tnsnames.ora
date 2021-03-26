@@ -1,7 +1,7 @@
 #  Общий  TNSNAMES.ORA 
 # По всем вопросам по данному файлу обращаться в Отдел администрирования 
-# баз данных dba@nomos.ru
-# Версия от 22/10/2015
+# баз данных dba_ora@open.ru
+# Версия от 29/08/2020
 ############################################################################
 #
 # DWH Group 
@@ -586,7 +586,7 @@ CFT_REGIOARC =
 #####  добавлено по просьбе Бычковой И.
 CFT_PKB =
   (DESCRIPTION =
-    (ADDRESS = (PROTOCOL = TCP)(HOST = 172.17.9.57)(PORT = 1526))
+    (ADDRESS = (PROTOCOL = TCP)(HOST = scudn.open.ru)(PORT = 1526))
     (CONNECT_DATA =
       (SERVER = DEDICATED)
       (SID = IBS)
@@ -597,7 +597,7 @@ CFT_PKB =
 #### заявка IM00231420
 BALU_PKB =
   (DESCRIPTION =
-    (ADDRESS = (PROTOCOL = TCP)(HOST = atol.pcb)(PORT = 1526))
+    (ADDRESS = (PROTOCOL = TCP)(HOST = scudn.open.ru)(PORT = 1526))
     (CONNECT_DATA =
       (SERVER = DEDICATED)
       (SID = BALU)
@@ -607,7 +607,7 @@ BALU_PKB =
 #### заявка IM00239236
 BALU =
   (DESCRIPTION =
-    (ADDRESS = (PROTOCOL = TCP)(HOST = atol.pcb)(PORT = 1526))
+    (ADDRESS = (PROTOCOL = TCP)(HOST = scudn.open.ru)(PORT = 1526))
     (CONNECT_DATA =
       (SERVER = DEDICATED)
       (SID = BALU)
@@ -690,15 +690,25 @@ CFTBANK = (DESCRIPTION=
       )
     )
 
+#база CFTBANK для тестов HOUSEKEEPING
+cft101t =
+  (DESCRIPTION =
+    (ADDRESS_LIST =
+      (ADDRESS = (PROTOCOL = TCP)(HOST = db-cfttst101.open.ru)(PORT = 9991))
+    )
+    (CONNECT_DATA =
+      (SERVICE_NAME = cft101t)
+    )
+  )
+
 
 ######## 013075122
 # BinBank тест
 # OTRS 012076277
-CFT_DEV2 =  (DESCRIPTION = (ENABLE=BROKEN) (ADDRESS_LIST = (ADDRESS = (PROTOCOL = TCP)(HOST = cft-dev3.bin.bank)(PORT = 9999))) (CONNECT_DATA = (SID = cft_dev2) (SERVER = DEDICATED)))
-cft_dev2_tst = (DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=cft-dev3.bin.bank)(PORT=9999)))(CONNECT_DATA=(SID=cft_dev2)))
+CFT_DEV2 =  (DESCRIPTION = (ENABLE=BROKEN) (ADDRESS_LIST = (ADDRESS = (PROTOCOL = TCP)(HOST = cft-dev3.bin.bank)(PORT = 9991))) (CONNECT_DATA = (SID = cft_dev2) (SERVER = DEDICATED)))
+cft_dev2_tst = (DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=cft-dev3.bin.bank)(PORT=9991)))(CONNECT_DATA=(SID=cft_dev2)))
 
-CFT_IB2=(DESCRIPTION=(ENABLE=BROKEN)(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=cft-dev3.bin.bank)(PORT=9991)))(CONNECT_DATA=(SID=cft_ib2)(SERVER=DEDICATED)))
-CFT_VSS_TST=(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=cft-dev3.bin.bank)(PORT=9999)))(CONNECT_DATA=(SID=cft_vss))) 
+CFT_VSS_TST=(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=cft-dev3.bin.bank)(PORT=9991)))(CONNECT_DATA=(SID=cft_vss)))
  
 
 
@@ -707,6 +717,14 @@ CFT_VSS_TST=(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=cft-dev3.bin
 #----------------------------------------------------------------------------
 # Тестовые БД группы CFT
 #----------------------------------------------------------------------------
+CFT_NT =
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = TCP)(HOST = db-flexcpm01.open.ru)(PORT = 1525))
+    (CONNECT_DATA =
+      (SERVER = DEDICATED)
+      (SERVICE_NAME = CFT)
+    )
+  )
 
 CFT_GO_TST08 =
   (DESCRIPTION =
@@ -807,15 +825,6 @@ CFT_DEV, CFT10T_TST =
 #  )
 
 
-CFT_GO_TST06 =
-  (DESCRIPTION =
-    (ADDRESS = (PROTOCOL = TCP)(HOST = dbcfttst002.open.ru)(PORT = 1530))
-    (CONNECT_DATA =
-      (SERVER = DEDICATED)
-      (SID = GO_TST06)
-    )
-  )
-
 ## 12.09.2018 - 010757841 ticket by KizlasovSI
 CFT_TT =
   (DESCRIPTION =
@@ -871,25 +880,16 @@ CFT_TT =
 #CFT_CN_TST05=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=10.64.96.36)(PORT=1531))(CONNECT_DATA=(SERVER=dedicated)(SID=test)))
 
 # заявка от Орлова А.И.  №490175
-CFT_DBCFTTST01 =
-  (DESCRIPTION =
-    (ADDRESS = (PROTOCOL = TCP)(HOST = DBCFTTST01)(PORT = 1521))
-    (CONNECT_DATA =
-      (SERVER = DEDICATED)
-      (SERVICE_NAME = CFT)
-    )
-  )
-
-
-# заявка от Клочкова В.Е. №548789
-#CFT_VERD =
+#CFT_DBCFTTST01 =
 #  (DESCRIPTION =
-#    (ADDRESS = (PROTOCOL = TCP)(HOST = 10.64.96.36)(PORT = 1530))
+#    (ADDRESS = (PROTOCOL = TCP)(HOST = DBCFTTST01)(PORT = 1521))
 #    (CONNECT_DATA =
 #      (SERVER = DEDICATED)
 #      (SERVICE_NAME = CFT)
 #    )
 #  )
+
+
 
 
 IBSO =
@@ -931,8 +931,7 @@ CFT_SECDBTEST =
     )
   )
 
-cft_ibsont=(description=(address=(protocol=tcp)(host= 10.64.73.189)(port=1526))(connect_data=(server=dedicated)(sid=ibsont)))
-cft_navi=(description=(address=(protocol=tcp)(host= 10.64.73.189)(port=1531))(connect_data=(server=dedicated)(service_name=CFT_NAVI)))
+CFT_IBSONT=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=db-flexcpm01.open.ru)(PORT=1525))(CONNECT_DATA=(SERVER=DEDICATED)(sid=CFT)))
 
 ###############################
 # Тестовые БД cft0xt, обновляемые снапшотами
@@ -983,7 +982,7 @@ CFT_GO_TST05, CFT05T_TST =
     )
   ) 
 
-CFT06T_TST =
+CFT_GO_TST06, CFT06T_TST =
   (DESCRIPTION =
     (ADDRESS = (PROTOCOL = TCP)(HOST = db-cfttst004.open.ru)(PORT = 9996))
     (CONNECT_DATA =
@@ -1020,9 +1019,14 @@ CFT_SIB, CFT09T_TST =
     )
   ) 
 
-
-
-
+CFT_77, CFT17T_TST =
+  (DESCRIPTION =
+     (ADDRESS = (PROTOCOL = TCP)(HOST = db-cfttst006.open.ru)(PORT = 9992))
+    (CONNECT_DATA =
+      (SERVER = DEDICATED)
+      (SID = cft17t)
+    )
+  )
 
 # OTRS 010627970
 # Лобанова Анастасия Николаевна <ANLobanova@binbank.ru>
@@ -1037,19 +1041,21 @@ FSSPTST3=(DESCRIPTION=(ENABLE=BROKEN)(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=
 
 FSSPTST4_TST=(DESCRIPTION=(ENABLE=BROKEN)(ADDRESS=(PROTOCOL=tcp)(HOST=nsk-db06.corp.icba.biz)(PORT=9999))(CONNECT_DATA=(Service_NAME=fssptst4)))
 
-CFT_CB_TST=(DESCRIPTION=(ENABLE=BROKEN)(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=cft-dev3.bin.bank)(PORT=9999)))(CONNECT_DATA=(SERVICE_NAME=cft_cb)))
+CFT_CB_TST=(DESCRIPTION=(ENABLE=BROKEN)(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=cft-dev3.bin.bank)(PORT=9991)))(CONNECT_DATA=(SERVICE_NAME=cft_cb)))
 
-CFT_AFIN_TST=(DESCRIPTION=(ENABLE=BROKEN)(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=cft-dev3.bin.bank)(PORT=9999)))(CONNECT_DATA=(SID=cft_afin)))
+CFT_IB2_TST=(DESCRIPTION=(ENABLE=BROKEN)(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=cft-dev3.bin.bank)(PORT=9991)))(CONNECT_DATA=(SERVICE_NAME=cft_ib2)))
+
+CFT_AFIN_TST=(DESCRIPTION=(ENABLE=BROKEN)(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=cft-dev3.bin.bank)(PORT=9991)))(CONNECT_DATA=(SID=cft_afin)))
 
 CFT_FACT_TST=(DESCRIPTION=(ENABLE=BROKEN)(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=cft-dev3.bin.bank)(PORT=9999)))(CONNECT_DATA=(SID=cft_fact)))
 
 CFT_BBKK_TST=(DESCRIPTION=(ENABLE=BROKEN)(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=cft-dev3.bin.bank)(PORT=9999)))(CONNECT_DATA=(SID=cft_bbkk)))
 
-CFT_FIX_TST=(DESCRIPTION=(ENABLE=BROKEN)(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=cft-dev3.bin.bank)(PORT=9999)))(CONNECT_DATA=(SID=cft_fix)))
+CFT_FIX_TST=(DESCRIPTION=(ENABLE=BROKEN)(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=cft-dev3.bin.bank)(PORT=9991)))(CONNECT_DATA=(SID=cft_fix)))
 
 CFT_STL_TST=(DESCRIPTION=(ENABLE=BROKEN)(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=cft-dev3.bin.bank)(PORT=9999)))(CONNECT_DATA=(SERVICE_NAME=cft_stl)))
 
-CFT_UO_TST=(DESCRIPTION=(ENABLE=BROKEN)(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=cft-dev3.bin.bank)(PORT=9999)))(CONNECT_DATA=(SID=cft_uo)))
+CFT_UO_TST=(DESCRIPTION=(ENABLE=BROKEN)(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=cft-dev3.bin.bank)(PORT=9991)))(CONNECT_DATA=(SID=cft_uo)))
 
 CFT_UPG_TST=(DESCRIPTION=(ENABLE=BROKEN)(ENABLE=BROKEN)(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=cft-dev3.bin.bank)(PORT=9999)))(CONNECT_DATA=(SID=cft_upg)))
 
@@ -1224,7 +1230,7 @@ QRMTST_IOS2 =
 #---------------------------------------------------------------
 DBOSS =
   (DESCRIPTION =
-    (ADDRESS = (PROTOCOL = TCP)(HOST = atol.pcb)(PORT = 1526))
+    (ADDRESS = (PROTOCOL = TCP)(HOST = scudn.open.ru)(PORT = 1526))
     (CONNECT_DATA =
       (SERVER = DEDICATED)
       (SID = DBOSS)
@@ -1318,10 +1324,10 @@ NMORAT, NMORAT_FINCUT =
 	(FAILOVER=on)
 	(TRANSPORT_CONNECT_TIMEOUT=10)  
     (ADDRESS_LIST =
+    (ADDRESS = (PROTOCOL = TCP)(HOST = dbex01-scan.open.ru)(PORT = 1526))
+    (ADDRESS = (PROTOCOL = TCP)(HOST = dbex02-scan.open.ru)(PORT = 1526))
     (ADDRESS = (PROTOCOL = TCP)(HOST = dbex04-scan.open.ru)(PORT = 1526))
     (ADDRESS = (PROTOCOL = TCP)(HOST = dbex05-scan.open.ru)(PORT = 1526))
-#      (ADDRESS = (PROTOCOL = TCP)(HOST = dbex04-scan.open.ru)(PORT = 1526))
-#      (ADDRESS = (PROTOCOL = TCP)(HOST = dbex01-scan.open.ru)(PORT = 1526))
     )
     (CONNECT_DATA =
 		(SERVICE_NAME = NMORAT)
@@ -1429,6 +1435,25 @@ CRHTEST =
     (CONNECT_DATA =
       (SERVER = DEDICATED)
       (SERVICE_NAME = CRHTEST)
+    )
+  )
+
+# Linux - новая БД 18c
+CRHDEV1T_TST =
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = TCP)(HOST = db-crhdev01.open.ru)(PORT = 9999))
+    (CONNECT_DATA =
+      (SERVER = DEDICATED)
+      (SERVICE_NAME = crhdev1t)
+    )
+  )
+
+CRH1T_TST =
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = TCP)(HOST = db-crhtst01.open.ru)(PORT = 9999))
+    (CONNECT_DATA =
+      (SERVER = DEDICATED)
+      (SERVICE_NAME = crh1t)
     )
   )
 
@@ -2036,6 +2061,16 @@ MARKETHB_TST-VALENCIA =
     )
   )
 
+MHUBT =
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = TCP)(HOST = db-mhub-tst01.open.ru)(PORT = 9999))
+    (CONNECT_DATA =
+      (SERVER = DEDICATED)
+      (SERVICE_NAME = mhubt)
+    )
+  )
+
+
 inter-old =
   (DESCRIPTION =
     (ADDRESS_LIST =
@@ -2058,6 +2093,21 @@ inter, security =
         (ADDRESS=(PROTOCOL=tcp)(HOST=security-h1.oradb.open.ru)(PORT=1527))
         (ADDRESS=(PROTOCOL=tcp)(HOST=security-h2.oradb.open.ru)(PORT=1527))
       (CONNECT_DATA=
+        (SERVICE_NAME=security_prm_taf)
+        (FAILOVER_MODE=(TYPE=session)(METHOD=basic))
+      )
+   )
+
+inter_adm =
+   (DESCRIPTION=
+      (ENABLE=BROKEN)
+      (LOAD_BALANCE=off)
+      (FAILOVER=on)
+      (TRANSPORT_CONNECT_TIMEOUT=10)
+        (ADDRESS=(PROTOCOL=tcp)(HOST=security-h1.oradb.open.ru)(PORT=1527))
+        (ADDRESS=(PROTOCOL=tcp)(HOST=security-h2.oradb.open.ru)(PORT=1527))
+      (CONNECT_DATA=
+        (UR=A)
         (SERVICE_NAME=security_prm_taf)
         (FAILOVER_MODE=(TYPE=session)(METHOD=basic))
       )
@@ -2088,12 +2138,15 @@ evrinoma2-old=(description=(address_list=(address=(protocol=tcp)(host=evrinoma.n
 evrinoma-old=(description=(address_list=(address=(protocol=tcp)(host=evrinoma.nomos.bank)(port=1530)))(connect_data=(ur=a) (service_name=security)))
 egina-old=(description=(address_list=(address=(protocol=tcp)(host=egina.nomos.bank)(port=1530)))(connect_data=(ur=a) (service_name=security)))
 egina2-old=(description=(address_list=(address=(protocol=tcp)(host=egina.nomos.bank)(port=1530)))(connect_data=(ur=a) (service_name=security2)))
-leon=(description=(address_list=(address=(protocol=tcp)(host=leon.nomos.bank)(port=1530)))(connect_data=(ur=a) (service_name=security)))
+#leon=(description=(address_list=(address=(protocol=tcp)(host=leon.nomos.bank)(port=1530)))(connect_data=(ur=a) (service_name=leon)))
+leon=(description=(address_list=(address=(protocol=tcp)(host=db-sofit-tst05.open.ru)(port=1530)))(connect_data=(ur=a)(service_name=security)))
+leon-old=(description=(address_list=(address=(protocol=tcp)(host=leon-old.open.ru)(port=1530)))(connect_data=(ur=a)(service_name=leon)))
 
 sofit01t_tst,evrinoma=(description=(enable=broken)(address_list=(address=(protocol=tcp)(host=db-sofit-tst01.open.ru)(port=9999)))(connect_data=(service_name=sofit01t)(server=dedicated)))
 sofit02t_tst,egina=(description=(enable=broken)(address_list=(address=(protocol=tcp)(host=db-sofit-tst02.open.ru)(port=9999)))(connect_data=(service_name=sofit02t)(server=dedicated)))
 sofit03t_tst,evrinoma2=(description=(enable=broken)(address_list=(address=(protocol=tcp)(host=db-sofit-tst03.open.ru)(port=9999)))(connect_data=(service_name=sofit03t)(server=dedicated)))
 sofit04t_tst,egina2=(description=(enable=broken)(address_list=(address=(protocol=tcp)(host=db-sofit-tst04.open.ru)(port=9999)))(connect_data=(service_name=sofit04t)(server=dedicated)))
+#sofit06t_tst=(description=(enable=broken)(address_list=(address=(protocol=tcp)(host=db-sofit-tst06.open.ru)(port=9999)))(connect_data=(service_name=sofit06t)(server=dedicated)))
 
 #-----------------------------------------------------------------------------
 
@@ -2923,21 +2976,49 @@ NVGDEV1.world =
 #------------------------------------------------------------------------------
 # ЕХД Банка "Открытие" - заявка 1083042
 #------------------------------------------------------------------------------
-EHD=
-  (DESCRIPTION=
-    (ADDRESS=
-      (PROTOCOL=TCP)
-      (HOST=10.48.62.130)
-      (PORT=1526)
-    )
-    (CONNECT_DATA=
-      (SERVER=dedicated)
-      (SID=jfrsdbp)
-    )
-  )
+#EHD=
+#  (DESCRIPTION=
+#    (ADDRESS=
+#      (PROTOCOL=TCP)
+#      (HOST=10.48.62.130)
+#      (PORT=1526)
+#    )
+#    (CONNECT_DATA=
+#      (SERVER=dedicated)
+#      (SID=jfrsdbp)
+#    )
+#  )
+
+EHD, JFRSDBP =
+(DESCRIPTION=
+	(ENABLE=BROKEN)
+	(LOAD_BALANCE=off)
+	(FAILOVER=on)
+	(TRANSPORT_CONNECT_TIMEOUT=10)
+	(ADDRESS=(PROTOCOL=tcp)(HOST= dbex01-scan.open.ru)(PORT=1526))
+	(ADDRESS=(PROTOCOL=tcp)(HOST= dbex02-scan.open.ru)(PORT=1526))
+	(CONNECT_DATA=
+		(SERVICE_NAME= jfrsdbp_prm_taf)
+		(FAILOVER_MODE=(TYPE=session)(METHOD=basic))
+	)
+)
 
 # OTRS ticket 09736176
-EHD_STB_READONLY=(DESCRIPTION = (ADDRESS_LIST = (ADDRESS = (PROTOCOL = TCP)(HOST = 10.48.62.6)(PORT = 1526))) (CONNECT_DATA = (SID = jfrsdbp)))
+EHD_STB_READONLY=
+  (DESCRIPTION=
+   (ENABLE=BROKEN)
+   (LOAD_BALANCE=off)
+   (FAILOVER=on)
+   (TRANSPORT_CONNECT_TIMEOUT=10)
+   (ADDRESS=(PROTOCOL=tcp)(HOST= dbex01-scan.open.ru)(PORT=1526))
+   (ADDRESS=(PROTOCOL=tcp)(HOST= dbex02-scan.open.ru)(PORT=1526))
+    (CONNECT_DATA=
+      (SERVICE_NAME= jfrsdbp_stb_taf)
+      (FAILOVER_MODE=(TYPE=session)(METHOD=basic))
+    )
+   )
+
+
 
 EHD1=
   (DESCRIPTION=
@@ -2955,7 +3036,7 @@ EHD1=
 # JFRSDBP=  (DESCRIPTION=    (ADDRESS=      (PROTOCOL=TCP)      (HOST=10.48.62.130)      (PORT=1526)    )    (CONNECT_DATA=      (SID=JFRSDBP)    )  )
 
 # OTRS 06558676
-JFRSDBP=  (DESCRIPTION=    (ADDRESS=      (PROTOCOL=TCP)      (HOST=10.48.62.130)      (PORT=1526)    )    (CONNECT_DATA=      (SID=JFRSDBP)    )  )
+#JFRSDBP=  (DESCRIPTION=    (ADDRESS=      (PROTOCOL=TCP)      (HOST=10.48.62.130)      (PORT=1526)    )    (CONNECT_DATA=      (SID=JFRSDBP)    )  )
 
 
 # 05319906 
@@ -3160,7 +3241,7 @@ prod_lnx =
       (ADDRESS = (PROTOCOL = TCP)(HOST = 10.66.247.22)(PORT = 1526))
     )
     (CONNECT_DATA =
-     (SID = prod)
+     (SERVICE_NAME = prod.card)
      (SERVER = DEDICATED)
     )
   )
@@ -3251,6 +3332,9 @@ WCPn2_WT=(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=10.1.8.12)(PORT
 #
 ##############################################################################
 
+# 024642107
+ULTRA.BANK.NVTB.RU=(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=10.10.0.4)(PORT=1521)))(CONNECT_DATA=(SID=nvtb)))
+
 # Заявка №05005732
 #cft_copy=(description=(address=(protocol=tcp)(host=10.64.96.36)(port=1524))(connect_data=(server=dedicated)(sid=copy)))
 ###
@@ -3267,7 +3351,7 @@ CFT_SPOD=(DESCRIPTION=(ADDRESS = (PROTOCOL = TCP)(HOST = 10.48.40.2)(PORT = 1939
 cft_study=(description=(address=(protocol=tcp)(host=10.48.40.2)(port=1573))(connect_data=(server=dedicated)(sid=study)))
 ###
 #cft_test=(description=(address=(protocol=tcp)(host=10.64.96.36)(port=1531))(connect_data=(server=dedicated)(sid=test)))
-cft_work=(description=(address=(protocol=tcp)(host=10.48.32.3)(port=1542))(connect_data=(server=dedicated)(sid=work)))
+cft_work=(description=(address=(protocol=tcp)(host=db-cft16.open.ru)(port=1542))(connect_data=(server=dedicated)(sid=work)))
 cft_work_readonly=(description=(address=(protocol=tcp)(host=10.48.32.9)(port=1542))(connect_data=(server=dedicated)(sid=work)))
 CFT_work_report=(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=10.64.96.134)(PORT=1562)))(CONNECT_DATA=(SID=report)(SERVER=DEDICATED)))
 CFT_READONLY=(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=10.64.96.134)(PORT=1542)))(CONNECT_DATA=(SID=work)(SERVER=DEDICATED)))
@@ -3299,8 +3383,8 @@ CFT_DWH = (DESCRIPTION = (ADDRESS = (PROTOCOL = TCP)(HOST = sigma.run.all.corp)(
 cft_open = (DESCRIPTION = (ADDRESS = (PROTOCOL=TCP)(HOST=10.48.40.2)(PORT=1743)) (CONNECT_DATA = (SERVER=dedicated) (SID=open) ) )
 CFT_DEVELOP=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=sigma.run.all.corp)(PORT=1535))(CONNECT_DATA=(SERVER=DEDICATED)(SID=develop)))
 #CFT_RELIZ=(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=10.64.96.36)(PORT = 1537)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=reliz)))
-db76=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=10.44.11.59)(PORT=1521))(CONNECT_DATA=(SID=db76)))
-cft_rtl=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=10.44.11.59)(PORT=1521))(CONNECT_DATA=(SID=rtl)))
+db76=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=10.216.15.64)(PORT=1521))(CONNECT_DATA=(SID=db76)))
+cft_rtl=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=10.216.15.64)(PORT=1521))(CONNECT_DATA=(SID=rtl)))
 IBS11_5.NMB.RU =(DESCRIPTION =(ADDRESS_LIST =(ADDRESS =(PROTOCOL = TCP)(HOST = 10.22.246.20)(PORT = 1525))) (CONNECT_DATA = (SID = ibs5)))
 IBSTEST=(description=(address_list=(address=(protocol=tcp)(host=10.64.73.144)(port=1526)))(connect_data=(sid=ibstest)(server=dedicated)))
 #cft_devgo2=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=10.64.96.36)(PORT=1622))(CONNECT_DATA=(SERVER=dedicated)(SID=devgo2)))
@@ -3310,7 +3394,7 @@ IBSTEST=(description=(address_list=(address=(protocol=tcp)(host=10.64.73.144)(po
 #cft_devgosv3= (description= (address= (protocol=tcp) (host=10.64.96.36) (port=1633) ) (connect_data= (server=dedicated) (sid=devgosv3) ) )
 #cft_nsksv= (description= (address= (protocol=tcp) (host=10.64.96.36) (port=1634) ) (connect_data= (server=dedicated) (sid=nsksv) ) )
 CFT_NSKSV=(description= (address_list= (address= (protocol= tcp)(host= 10.64.73.138)(port= 1735)) ) (connect_data= (server= dedicated) (sid=cfttd4) ) )
-cft_db76=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=10.44.11.59)(PORT=1521))(CONNECT_DATA=(SID=db76)))
+cft_db76=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=10.216.15.64)(PORT=1521))(CONNECT_DATA=(SID=db76)))
 CFT_HMBOARCH=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=10.64.96.36)(PORT=1729))(CONNECT_DATA=(SERVER=DEDICATED)(SID=HMBOARCH)))
 #CFT_AUD=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=omikron)(PORT=1944))(CONNECT_DATA=(SERVER=dedicated)(SID=aud)))
 
@@ -3539,6 +3623,9 @@ RTL =
       (SID = rtl)
     )
   )
+
+loadtest_3card = (description= (address_list= (address= (protocol= tcp)(host= 10.64.73.189)(port= 1531)) ) (connect_data= (server= dedicated) (sid=rtl) ) )
+
 
 WAY_PROD =
   (DESCRIPTION =
@@ -3915,7 +4002,7 @@ card_report_ro =
       (ADDRESS = (PROTOCOL = TCP)(HOST = cardreport.open.ru)(PORT = 1530))
     )
     (CONNECT_DATA =
-      (service_name = stb3)
+      (SID=rtl)
     )
    )
 
@@ -4076,18 +4163,18 @@ card_tst77= (description= (address= (protocol= tcp)(host=db-3cardtst02.open.ru)(
 
 card_tst12= (description= (address= (protocol= tcp)(host= toliman.open.ru)(port= 1631)) (connect_data= (server= dedicated) (sid = tst12) ) )
 
-3card_open=
-  (DESCRIPTION=
-    (ADDRESS=
-      (PROTOCOL=TCP)
-      (HOST=10.64.73.136)
-      (PORT=1643)
-    )
-    (CONNECT_DATA=
-      (SERVER=dedicated)
-      (SID=open)
-    )
-  )
+#3card_open=
+#  (DESCRIPTION=
+#    (ADDRESS=
+#      (PROTOCOL=TCP)
+#      (HOST=10.64.73.136)
+#      (PORT=1643)
+#    )
+#    (CONNECT_DATA=
+#      (SERVER=dedicated)
+#      (SID=open)
+#    )
+#  )
 
 OWAY_NAVI02_REPORT=
   (DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=10.64.73.137)(PORT=1536))
@@ -4143,7 +4230,35 @@ DETWIG =
     )
   )
 
-# стендбай в RO для базы процессинга эксМДМ
+# primary БД процессинга эксМДМ
+PROD_MDM_PRM =
+ (DESCRIPTION = 
+   (ADDRESS_LIST = 
+     (ADDRESS=(PROTOCOL=TCP)(HOST=4way-h1.oradb.open.ru)(PORT=1526)) 
+     (ADDRESS=(PROTOCOL=TCP)(HOST=4way-h2.oradb.open.ru)(PORT=1526)) 
+     (FAILOVER=TRUE) 
+   ) 
+   (CONNECT_DATA = 
+     (SERVICE_NAME = prod_prm_taf) 
+     (SERVER=DEDICATED) 
+   ) 
+ )
+
+# standby БД в MOUNT процессинга эксМДМ
+PROD_MDM_STB =
+ (DESCRIPTION = 
+   (ADDRESS_LIST = 
+     (ADDRESS=(PROTOCOL=TCP)(HOST=4way-h1.oradb.open.ru)(PORT=1526)) 
+     (ADDRESS=(PROTOCOL=TCP)(HOST=4way-h2.oradb.open.ru)(PORT=1526)) 
+     (FAILOVER=TRUE) 
+   ) 
+   (CONNECT_DATA = 
+     (SERVICE_NAME = prod_stb_taf) 
+     (SERVER=DEDICATED) 
+   ) 
+ )
+
+# standby БД в MOUNT процессинга эксМДМ
 OWSDB2_MDM =
    (DESCRIPTION =
     (ADDRESS = (PROTOCOL = TCP)(HOST = msk-owsdb02.corp.icba.biz)(PORT = 1526))
@@ -4153,22 +4268,35 @@ OWSDB2_MDM =
     )
   )
 
+# standby БД в RO процессинга эксМДМ на площадке open.ru
+PROD_MDM_OPEN_STB =
+   (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = TCP)(HOST = db-4way01.open.ru)(PORT = 1888))
+    (CONNECT_DATA =
+      (SERVER = DEDICATED)
+      (SERVICE_NAME = prod)
+    )
+  )
+
+# Пилот WAY_Clone_wizard - Волков Греков
+WAY_CLNWIZ=(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=10.64.73.146)(PORT=9991)))(CONNECT_DATA=(SID=clnwiz)))
+
 ##########################################################
 #
 #   Petrobank-F
 #
 ##########################################################
-PNCT,PNCT_D=(description=(address=(protocol=tcp)(host=10.48.39.134)(port=1571))(connect_data=(server=dedicated)(service_name=PNCT)))
-PNSO=(description=(address=(protocol=tcp)(host=10.48.39.134)(port=1581))(connect_data=(server=dedicated)(service_name=PNSO)))
-ARCH,ARCH_ARCH,ARCH_CITY6=(description=(address=(protocol=tcp)(host=10.48.39.134)(port=1561))(connect_data=(server=dedicated)(service_name=ARCH)))
-CENTER,CENTER_D=(description=(address=(protocol=tcp)(host=10.48.39.134)(port=1551))(connect_data=(server=dedicated)(service_name=CENTER)))
-OLAP=(description=(address=(protocol=tcp)(host=10.48.39.134)(port=1541))(connect_data=(server=dedicated)(service_name=OLAP)))
+PNCT,PNCT_D=(description=(address=(protocol=tcp)(host=10.48.39.133)(port=1571))(connect_data=(server=dedicated)(service_name=PNCT)))
+PNSO=(description=(address=(protocol=tcp)(host=10.48.39.133)(port=1581))(connect_data=(server=dedicated)(service_name=PNSO)))
+ARCH,ARCH_ARCH,ARCH_CITY6=(description=(address=(protocol=tcp)(host=10.48.39.133)(port=1561))(connect_data=(server=dedicated)(service_name=ARCH)))
+CENTER,CENTER_D=(description=(address=(protocol=tcp)(host=10.48.39.133)(port=1551))(connect_data=(server=dedicated)(service_name=CENTER)))
+OLAP=(description=(address=(protocol=tcp)(host=10.48.39.133)(port=1541))(connect_data=(server=dedicated)(service_name=OLAP)))
 
-OLAP_MSK.ORAPBD=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=10.48.39.134)(PORT=1541))(CONNECT_DATA=(SERVER=DEDICATED)(SID=OLAP)))
-CENTER_MSK.ORAPBD=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=10.48.39.134)(PORT=1551))(CONNECT_DATA=(SERVER=DEDICATED)(SID=CENTER)))
-ARCH_MSK.ORAPBD=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=10.48.39.134)(PORT=1561))(CONNECT_DATA=(SERVER=DEDICATED)(SID=ARCH)))
-PNCT_MSK.ORAPBD=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=10.48.39.134)(PORT=1571))(CONNECT_DATA=(SERVER=DEDICATED)(SID=PNCT)))
-PNSO_MSK.ORAPBD=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=10.48.39.134)(PORT=1581))(CONNECT_DATA=(SERVER=DEDICATED)(SID=PNSO)))
+OLAP_MSK.ORAPBD=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=10.48.39.133)(PORT=1541))(CONNECT_DATA=(SERVER=DEDICATED)(SID=OLAP)))
+CENTER_MSK.ORAPBD=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=10.48.39.133)(PORT=1551))(CONNECT_DATA=(SERVER=DEDICATED)(SID=CENTER)))
+ARCH_MSK.ORAPBD=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=10.48.39.133)(PORT=1561))(CONNECT_DATA=(SERVER=DEDICATED)(SID=ARCH)))
+PNCT_MSK.ORAPBD=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=10.48.39.133)(PORT=1571))(CONNECT_DATA=(SERVER=DEDICATED)(SID=PNCT)))
+PNSO_MSK.ORAPBD=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=10.48.39.133)(PORT=1581))(CONNECT_DATA=(SERVER=DEDICATED)(SID=PNSO)))
 
 #ARCH_TEST=(description=(address=(protocol=tcp)(host=10.48.33.194)(port=1661))(connect_data=(server=dedicated)(sid=ARCHTST1)))
 #PNCT_TEST=(description=(address=(protocol=tcp)(host=10.48.33.194)(port=1671))(connect_data=(server=dedicated)(sid=PNCTTST1)))
@@ -4214,23 +4342,33 @@ FCS_SB =
 # DRR
 ####################################
 
-DRR = 
-  (description=
-    (ADDRESS = (PROTOCOL = TCP)(HOST = 10.52.62.16)(PORT = 1526))
-    (connect_data=
-       (server=dedicated)
-       (sid=DRR)
-    )
-  )
+DRR =
+(DESCRIPTION=
+	(ENABLE=BROKEN)
+	(LOAD_BALANCE=off)
+	(FAILOVER=on)
+	(TRANSPORT_CONNECT_TIMEOUT=10)
+	(ADDRESS=(PROTOCOL=tcp)(HOST=drr-h1.oradb.open.ru)(PORT=1526))
+	(ADDRESS=(PROTOCOL=tcp)(HOST=drr-h2.oradb.open.ru)(PORT=1526))
+	(CONNECT_DATA=
+		(SERVICE_NAME=drr_prm_taf)
+		(FAILOVER_MODE=(TYPE=session)(METHOD=basic))
+	)
+)
 
-DRR2 = 
-  (description=
-    (ADDRESS = (PROTOCOL = TCP)(HOST = 10.48.62.134)(PORT = 1526))
-    (connect_data=
-       (server=dedicated)
-       (sid=DRR)
-    )
-  )
+DRR_STB =
+(DESCRIPTION=
+	(ENABLE=BROKEN)
+	(LOAD_BALANCE=off)
+	(FAILOVER=on)
+	(TRANSPORT_CONNECT_TIMEOUT=10)
+	(ADDRESS=(PROTOCOL=tcp)(HOST=drr-h1.oradb.open.ru)(PORT=1526))
+	(ADDRESS=(PROTOCOL=tcp)(HOST=drr-h2.oradb.open.ru)(PORT=1526))
+	(CONNECT_DATA=
+		(SERVICE_NAME=drr_stb_taf)
+		(FAILOVER_MODE=(TYPE=session)(METHOD=basic))
+	)
+)
 
 ###################################################################
 #OW PKB TST2
@@ -4457,7 +4595,7 @@ SAS_AML =
 cft_mf_arch =
   (DESCRIPTION =
     (ADDRESS_LIST =
-      (ADDRESS = (PROTOCOL = TCP)(HOST = 10.48.41.48)(PORT = 1526))
+      (ADDRESS = (PROTOCOL = TCP)(HOST = 10.48.41.49)(PORT = 1526))
     )
     (CONNECT_DATA =
       (SERVER = DEDICATED)
@@ -4479,7 +4617,7 @@ WORKMA=
   (DESCRIPTION=
     (ADDRESS=
       (PROTOCOL = TCP)
-      (HOST = 10.48.63.24)
+      (HOST = db-dko01.open.ru)
       (PORT = 1526)
     ) 
     (CONNECT_DATA=
@@ -4515,14 +4653,42 @@ TESTMA2=
 
 # Новый сервер SAS MA ACRM розницы.
 
-NEW_SASRTDMD =
-  (DESCRIPTION =
-    (ADDRESS_LIST =
-      (ADDRESS = (PROTOCOL = TCP)(HOST = db-sasrtdm004.open.ru)(PORT = 1526))
-    )
-    (CONNECT_DATA =
-      (service_name = sasrtdmd)
-    )
+#NEW_SASRTDMD =
+#  (DESCRIPTION =
+#    (ADDRESS_LIST =
+#      (ADDRESS = (PROTOCOL = TCP)(HOST = db-sasrtdm004.open.ru)(PORT = 1526))
+#    )
+#    (CONNECT_DATA =
+#      (service_name = sasrtdmd)
+#    )
+#   )
+
+NEW_SASRTDMD,SASRTDMD =
+   (DESCRIPTION=
+      (ENABLE=BROKEN)
+      (LOAD_BALANCE=off)
+      (FAILOVER=on)
+      (TRANSPORT_CONNECT_TIMEOUT=10)
+        (ADDRESS=(PROTOCOL=tcp)(HOST=sasrtdmd-h1.oradb.open.ru)(PORT=1526))
+        (ADDRESS=(PROTOCOL=tcp)(HOST=sasrtdmd-h2.oradb.open.ru)(PORT=1526))
+      (CONNECT_DATA=
+        (SERVICE_NAME=sasrtdmd_prm_taf.open.ru)
+        (FAILOVER_MODE=(TYPE=session)(METHOD=basic))
+      )
+   )
+
+SASRTDMD_STB =
+   (DESCRIPTION=
+      (ENABLE=BROKEN)
+      (LOAD_BALANCE=off)
+      (FAILOVER=on)
+      (TRANSPORT_CONNECT_TIMEOUT=10)
+        (ADDRESS=(PROTOCOL=tcp)(HOST=sasrtdmd-h1.oradb.open.ru)(PORT=1526))
+        (ADDRESS=(PROTOCOL=tcp)(HOST=sasrtdmd-h2.oradb.open.ru)(PORT=1526))
+      (CONNECT_DATA=
+        (SERVICE_NAME=sasrtdmd_stb_taf.open.ru)
+        (FAILOVER_MODE=(TYPE=session)(METHOD=basic))
+      )
    )
 
 # OTRS 011072031
@@ -4596,11 +4762,31 @@ rsdh_infa =
 # бизнес-владелец процесса Мокшанцев Сергей
 #
 ACRM,SME_PROD =
-  (DESCRIPTION =
-     (ADDRESS = (PROTOCOL = TCP)(HOST = rumskdbp429.open.ru)(PORT = 1530))
-     (CONNECT_DATA =
-    (SID = acrm)
-  )
+(DESCRIPTION=
+	(ENABLE=BROKEN)
+	(LOAD_BALANCE=off)
+	(FAILOVER=on)
+	(TRANSPORT_CONNECT_TIMEOUT=10)
+	(ADDRESS=(PROTOCOL=tcp)(HOST= acrm-h1.oradb.open.ru)(PORT=1526))
+	(ADDRESS=(PROTOCOL=tcp)(HOST= acrm-h2.oradb.open.ru)(PORT=1526))
+	(CONNECT_DATA=
+		(SERVICE_NAME= acrm_prm_taf)
+		(FAILOVER_MODE=(TYPE=session)(METHOD=basic))
+	)
+)
+
+ACRM_STB =
+(DESCRIPTION=
+	(ENABLE=BROKEN)
+	(LOAD_BALANCE=off)
+	(FAILOVER=on)
+	(TRANSPORT_CONNECT_TIMEOUT=10)
+	(ADDRESS=(PROTOCOL=tcp)(HOST= acrm-h1.oradb.open.ru)(PORT=1526))
+	(ADDRESS=(PROTOCOL=tcp)(HOST= acrm-h2.oradb.open.ru)(PORT=1526))
+	(CONNECT_DATA=
+		(SERVICE_NAME= acrm_stb_taf)
+		(FAILOVER_MODE=(TYPE=session)(METHOD=basic))
+	)
 )
 
 #################################
@@ -4667,6 +4853,15 @@ SIEBELT1_TST =
     )
   )
 
+SIEBELNT_TST =
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = TCP)(HOST = db-siebel-nt01.open.ru)(PORT = 9999))
+    (CONNECT_DATA =
+      (SERVER = DEDICATED)
+      (SERVICE_NAME = SIEBELNT)
+    )
+  )
+
 # OTRS 018784184   13.01.2020
 # Владелец БД - Федоров Дмитрий Игоревич
 # БД второго тестового контура Siebel 
@@ -4679,6 +4874,54 @@ siebel_tst2 =
     (sid = siebel)
   )
 )
+
+# OTRS 020023145
+# БД для 4-х dev контуров Siebel Collection.
+# Грицик А.А, Тарасов С.В.
+SIEBDEV1_TST =
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = TCP)(HOST = db-siebel-dev01.open.ru)(PORT = 9999))
+    (CONNECT_DATA =
+      (SERVER = DEDICATED)
+      (SERVICE_NAME = siebdev1)
+    )
+  )
+
+SIEBDEV2_TST =
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = TCP)(HOST = db-siebel-dev02.open.ru)(PORT = 9999))
+    (CONNECT_DATA =
+      (SERVER = DEDICATED)
+      (SERVICE_NAME = siebdev2)
+    )
+  )
+
+SIEBDEV3_TST =
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = TCP)(HOST = db-siebel-dev02.open.ru)(PORT = 9999))
+    (CONNECT_DATA =
+      (SERVER = DEDICATED)
+      (SERVICE_NAME = siebdev3)
+    )
+  )
+
+SIEBDEV4_TST =
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = TCP)(HOST = db-siebel-dev02.open.ru)(PORT = 9999))
+    (CONNECT_DATA =
+      (SERVER = DEDICATED)
+      (SERVICE_NAME = siebdev4)
+    )
+  )
+
+SIEBDEV5_TST =
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = TCP)(HOST = db-siebel-dev02.open.ru)(PORT = 9999))
+    (CONNECT_DATA =
+      (SERVER = DEDICATED)
+      (SERVICE_NAME = siebdev5)
+    )
+  )
 
 ################
 # SAP  - Ковязин И.
@@ -4750,7 +4993,29 @@ hjp_stb =
       )
     )
 
+# Тестовые
 
+hus_dev =
+(DESCRIPTION =
+    (ADDRESS_LIST =
+      (ADDRESS = (PROTOCOL = TCP)(HOST = tst-sapupddev01.open.ru)(PORT = 9999))
+    )
+    (CONNECT_DATA =
+      (SERVER = DEDICATED)
+      (SERVICE_NAME = HUS)
+    )
+  )
+
+huq_tst =
+(DESCRIPTION =
+    (ADDRESS_LIST =
+      (ADDRESS = (PROTOCOL = TCP)(HOST = tst-sapupdtest01.open.ru)(PORT = 9999))
+    )
+    (CONNECT_DATA =
+      (SERVER = DEDICATED)
+      (SERVICE_NAME = HUQ)
+    )
+  )
 
 
 
@@ -4873,8 +5138,6 @@ octopus =
       )
    )
 
-       
-
 # "Система управления эмиссии карт" Октопус
 OCTOPUST_TST =
   (DESCRIPTION =
@@ -4882,6 +5145,36 @@ OCTOPUST_TST =
     (CONNECT_DATA =
       (SERVER = DEDICATED)
       (SERVICE_NAME = octopust)
+    )
+  )
+
+# OTRS 025175414
+OCTOPUST2_TST =
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = TCP)(HOST = db-octopus-tst01.open.ru)(PORT = 9998))
+    (CONNECT_DATA =
+      (SERVER = DEDICATED)
+      (SERVICE_NAME = octopust2)
+    )
+  )
+
+# OTRS 022372043
+OCTOPRE_TST =
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = TCP)(HOST = db-octopus-pre01.open.ru)(PORT = 9999))
+    (CONNECT_DATA =
+      (SERVER = DEDICATED)
+      (SERVICE_NAME = octopre)
+    )
+  )
+
+# OTRS 023687980
+OCTOPRE2_TST =
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = TCP)(HOST = db-octopus-pre01.open.ru)(PORT = 9998))
+    (CONNECT_DATA =
+      (SERVER = DEDICATED)
+      (SERVICE_NAME = octopre2)
     )
   )
 
@@ -4917,8 +5210,15 @@ smsdb =
       )
     )
 
-
-
+# база для нагрузочного тестирования (Ванюшкин Сергей Александрович)
+SMSNT_TST =
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = TCP)(HOST = db-smstst01.open.ru)(PORT = 9999))
+    (CONNECT_DATA =
+      (SERVER = DEDICATED)
+      (SERVICE_NAME = SMSNT)
+    )
+  )
 
 #---------------------------------------------------------------------------
 # EXADATA
@@ -4949,20 +5249,23 @@ ehd_dbex02 =
       (SERVICE_NAME = jfrsdbp_dbex02)
     )
   )
-  
-  
-#----Temporary alias for new test EHD1.0 - for migration period --Skulkin
-jfrsdbp_dbex01_tst =
-  (DESCRIPTION =
-    (ADDRESS_LIST =
-      (ADDRESS = (PROTOCOL = TCP)(HOST = dbex01-scan.open.ru)(PORT = 1526))
-    )
-    (CONNECT_DATA =
-      (SERVER = DEDICATED)
-      (SERVICE_NAME = jfrsdbp_dbex01)
-    )
-  )
 
+ehd_stb =
+  (DESCRIPTION=
+   (ENABLE=BROKEN)
+   (LOAD_BALANCE=off)
+   (FAILOVER=on)
+   (TRANSPORT_CONNECT_TIMEOUT=10)
+   (ADDRESS=(PROTOCOL=tcp)(HOST= dbex01-scan.open.ru)(PORT=1526))
+   (ADDRESS=(PROTOCOL=tcp)(HOST= dbex02-scan.open.ru)(PORT=1526))
+    (CONNECT_DATA=
+      (SERVICE_NAME= jfrsdbp_stb_taf)
+      (FAILOVER_MODE=(TYPE=session)(METHOD=basic))
+    )
+   )
+
+
+  
 dwh_dbex02 =
   (DESCRIPTION =
     (ADDRESS_LIST =
@@ -4973,6 +5276,21 @@ dwh_dbex02 =
       (SERVICE_NAME = dwh)
     )
   )
+
+### Система подготовки отчетности / System Reporting Preparing Framework / Хохлов Р.Е.  
+SRPFRMWK =
+(DESCRIPTION=
+	(ENABLE=BROKEN)
+	(LOAD_BALANCE=off)
+	(FAILOVER=on)
+	(TRANSPORT_CONNECT_TIMEOUT=10)
+	(ADDRESS=(PROTOCOL=tcp)(HOST= dbex04-scan.open.ru)(PORT=1526))
+	(ADDRESS=(PROTOCOL=tcp)(HOST= dbex05-scan.open.ru)(PORT=1526))
+	(CONNECT_DATA=
+		(SERVICE_NAME= srpfrmwk_prm_taf)
+		(FAILOVER_MODE=(TYPE=session)(METHOD=basic))
+	)
+)
 
 ATLANT =
 (DESCRIPTION=
@@ -5084,7 +5402,8 @@ CDI_STB =
 # Тестовая CDI Зипухо И.В.
 CDI1_TST =
   (DESCRIPTION =
-    (ADDRESS = (PROTOCOL = TCP)(HOST = db-cdi-tst01.open.ru)(PORT = 9999))
+    (ADDRESS = (PROTOCOL = TCP)(HOST = dbex03-scan.open.ru)(PORT = 1526))
+#    (ADDRESS = (PROTOCOL = TCP)(HOST = db-cdi-tst01.open.ru)(PORT = 9999))
     (CONNECT_DATA =
       (SERVER = DEDICATED)
       (SERVICE_NAME = cdi1)
@@ -5151,17 +5470,18 @@ RBOROL3=(DESCRIPTION=(ENABLE=BROKEN)(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=t
 # Копайгора А.В.
 ###########################################################################
 FSSP_BIN=
-    (DESCRIPTION=
-      (ENABLE=BROKEN)
-      (LOAD_BALANCE=off)
-      (FAILOVER=on)
-      (TRANSPORT_CONNECT_TIMEOUT=10)
-        (ADDRESS=(PROTOCOL=tcp)(HOST=fssp-stb.oradb.svc.corp.icba.biz)(PORT=1512))
-        (ADDRESS=(PROTOCOL=tcp)(HOST=fssp-prm.oradb.svc.corp.icba.biz)(PORT=1512))
-      (CONNECT_DATA=
-        (SERVICE_NAME=fssp_prm_taf)
-        (FAILOVER_MODE=(TYPE=session)(METHOD=basic))
-      )
+(DESCRIPTION=
+	(ENABLE=BROKEN)
+	(LOAD_BALANCE=off)
+	(FAILOVER=on)
+	(TRANSPORT_CONNECT_TIMEOUT=10)
+	(ADDRESS=(PROTOCOL=tcp)(HOST=fssp-stb.oradb.svc.corp.icba.biz)(PORT=1512))
+	(ADDRESS=(PROTOCOL=tcp)(HOST=fssp-prm.oradb.svc.corp.icba.biz)(PORT=1512))
+	(CONNECT_DATA=
+		(SERVICE_NAME=fssp_prm_taf)
+		(FAILOVER_MODE=(TYPE=session)
+		(METHOD=basic))
+	)
 )
 
 # OTRS 015061932
@@ -5171,8 +5491,17 @@ FSSPROL_TST = (DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=titan-rbot
 # Владимир Феоктистов 88-50470
 #cft-dev3.bin.bank [10.18.11.199]
 cft_cdbo_tst =  (DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=cft-dev3.bin.bank)(PORT=9999)))(CONNECT_DATA=(SERVICE_NAME=cft_cdbo)))
-foivdev1_tst =  (DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=db-cftfoiv-dev.open.ru)(PORT=9999)))(CONNECT_DATA=(service_name=foivdev1)))
+foivdev1_tst =  (DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=db-cftfoiv-dev.open.ru)(PORT=9998)))(CONNECT_DATA=(service_name=foivdev1)))
 foivdev2_tst =  (DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=db-cftfoiv-dev.open.ru)(PORT=9999)))(CONNECT_DATA=(service_name=foivdev2)))
+
+# foiv_tst
+foivtst1_tst=(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=db-cftfoiv-tst.open.ru)(PORT=9998)))(CONNECT_DATA=(service_name=foivtst1)))
+foivtst2_tst=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=db-cftfoiv-tst.open.ru)(PORT=9998))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=foivtst2)))
+foivpre_tst=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=db-cftfoiv01.open.ru)(PORT=9999))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=foivpre)))
+
+cftfoiv_db-cftfoiv01=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=db-cftfoiv01.open.ru)(PORT=9999))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=cftfoiv)))
+
+
 
 ###############################
 # Система обработки заявок (СОЗ - ООО "Диасофт")
@@ -5187,9 +5516,21 @@ SOZ, SOZ-RES =
         (ADDRESS=(PROTOCOL=tcp)(HOST=soz-h1.oradb.open.ru)(PORT=1526))
         (ADDRESS=(PROTOCOL=tcp)(HOST=soz-h2.oradb.open.ru)(PORT=1526))
       (CONNECT_DATA=
-#временно пока старый
-        (SERVICE_NAME=soz_prm.rbr.ru)
-#        (SERVICE_NAME=soz_prm_taf.rbr.ru)
+        (SERVICE_NAME=soz_prm_taf.rbr.ru)
+        (FAILOVER_MODE=(TYPE=session)(METHOD=basic))
+      )
+   )
+
+SOZ_STB =
+   (DESCRIPTION=
+      (ENABLE=BROKEN)
+      (LOAD_BALANCE=off)
+      (FAILOVER=on)
+      (TRANSPORT_CONNECT_TIMEOUT=10)
+        (ADDRESS=(PROTOCOL=tcp)(HOST=soz-h1.oradb.open.ru)(PORT=1526))
+        (ADDRESS=(PROTOCOL=tcp)(HOST=soz-h2.oradb.open.ru)(PORT=1526))
+      (CONNECT_DATA=
+        (SERVICE_NAME=soz_stb_taf.rbr.ru)
         (FAILOVER_MODE=(TYPE=session)(METHOD=basic))
       )
    )
@@ -5198,6 +5539,16 @@ SOZ, SOZ-RES =
 # Система обработки заявок. Тестовая БД
 # Городилов А.В.
 sozpart_tst=(DESCRIPTION=(ENABLE=BROKEN)(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=db-soztst02.open.ru)(PORT=9999)))(CONNECT_DATA=(service_name=sozpart)))
+
+#######################
+SOZ01 =
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = TCP)(HOST = 10.48.43.76)(PORT = 1525))
+    (CONNECT_DATA =
+      (SERVER = DEDICATED)
+      (SERVICE_NAME=SOZ01) 
+                )
+  )
 
 
 ###############################
@@ -5250,9 +5601,15 @@ green03 =
     )
   )
 
-foivtst1_tst=(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=db-cftfoiv-tst.open.ru)(PORT=9999)))(CONNECT_DATA=(service_name=foivtst1)))
-foivtst2_tst=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=db-cftfoiv-tst.open.ru)(PORT=9999))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=foivtst2)))
-foivpre_tst=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=db-cftfoiv01.open.ru)(PORT=9999))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=foivpre)))
+green_tst2 =
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = TCP)(HOST = dbgreen03.open.ru)(PORT = 1527))
+    (CONNECT_DATA =
+      (SERVER = DEDICATED)
+      (SERVICE_NAME = green2.open.ru)
+    )
+  )
+
 
 ###################################################
 # Четыре базы на Exadata3 для разработки/теста ЕХД
@@ -5264,10 +5621,10 @@ DEV_DBEX03 =
     (CONNECT_DATA = (SERVER = DEDICATED)(SERVICE_NAME = ehddev))
   )
 
-TEST_DBEX03 =
+ATLANT_DEV =
   (DESCRIPTION =
     (ADDRESS = (PROTOCOL = TCP)(HOST = dbex03-scan.open.ru)(PORT = 1526))
-    (CONNECT_DATA = (SERVER = DEDICATED)(SERVICE_NAME = ehdtest))
+    (CONNECT_DATA = (SERVER = DEDICATED)(SERVICE_NAME = ATLANT_DEV))
   )
 
 ROLLOUT_DBEX03 =
@@ -5301,6 +5658,19 @@ atribut=(DESCRIPTION=
       )
 )
 
+atribut_stb=(DESCRIPTION=
+      (ENABLE=BROKEN)
+      (LOAD_BALANCE=off)
+      (FAILOVER=on)
+      (TRANSPORT_CONNECT_TIMEOUT=10)
+       (ADDRESS=(PROTOCOL=tcp)(HOST=atribut-h1.oradb.open.ru)(PORT=1526))
+       (ADDRESS=(PROTOCOL=tcp)(HOST=atribut-h2.oradb.open.ru)(PORT=1526))
+      (CONNECT_DATA=
+        (SERVICE_NAME=atribut_stb_taf)
+        (FAILOVER_MODE=(TYPE=session)(METHOD=basic))
+      )
+)
+
 fis_atr001_tst =
   (DESCRIPTION =
     (ADDRESS = (PROTOCOL = TCP)(HOST = tst-db-atr001.open.ru)(PORT = 9999))
@@ -5309,6 +5679,16 @@ fis_atr001_tst =
       (SERVICE_NAME = fis)
     )
   )
+
+FIS_ATR002_TST =
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = TCP)(HOST = db-atr004.open.ru)(PORT = 9999))
+    (CONNECT_DATA =
+      (SERVER = DEDICATED)
+      (SID=fis)
+    )
+  )
+
 
 
 #####################################################
@@ -5327,6 +5707,16 @@ atr01pre_tst =
 
 #Нагрузочный стенд
 atrlt_tst = (DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=db-atribut-lt01.open.ru)(PORT=9999))(CONNECT_DATA =(SERVER = DEDICATED)(SERVICE_NAME = atrlt)))
+
+# 020294512
+atributt_tst =
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = TCP)(HOST = db-atribut-tst01.open.ru)(PORT = 9999))
+    (CONNECT_DATA =
+      (SERVER = DEDICATED)
+      (SERVICE_NAME = atributt)
+    )
+  )
 
 
 #####################################################
@@ -5443,6 +5833,34 @@ MAGENT2_TST =
 # OTRS 014619442
 #####################################################
 
+CASHMNG_PRM =
+   (DESCRIPTION=
+      (ENABLE=BROKEN)
+      (LOAD_BALANCE=off)
+      (FAILOVER=on)
+      (TRANSPORT_CONNECT_TIMEOUT=10)
+        (ADDRESS=(PROTOCOL=tcp)(HOST=db-cashmng01.open.ru)(PORT=1526))
+        (ADDRESS=(PROTOCOL=tcp)(HOST=db-cashmng02.open.ru)(PORT=1526))
+      (CONNECT_DATA=
+        (SERVICE_NAME=cashmng_prm_taf)
+        (FAILOVER_MODE=(TYPE=session)(METHOD=basic))
+      )
+   )
+
+CASHMNG_STB =
+   (DESCRIPTION=
+      (ENABLE=BROKEN)
+      (LOAD_BALANCE=off)
+      (FAILOVER=on)
+      (TRANSPORT_CONNECT_TIMEOUT=10)
+        (ADDRESS=(PROTOCOL=tcp)(HOST=db-cashmng01.open.ru)(PORT=1526))
+        (ADDRESS=(PROTOCOL=tcp)(HOST=db-cashmng02.open.ru)(PORT=1526))
+      (CONNECT_DATA=
+        (SERVICE_NAME=cashmng_stb_taf)
+        (FAILOVER_MODE=(TYPE=session)(METHOD=basic))
+      )
+   )
+
 
 CASHMNG =
   (DESCRIPTION =
@@ -5458,7 +5876,7 @@ CASHMNG_TST =
     (ADDRESS = (PROTOCOL = TCP)(HOST = tst-cashmng01.open.ru)(PORT = 1526))
     (CONNECT_DATA =
       (SERVER = DEDICATED)
-      (SERVICE_NAME = prim_cashmng)
+      (SERVICE_NAME = CASHMNG_TST)
     )
   )
 
@@ -5565,6 +5983,23 @@ siebelv8_stb =
         (FAILOVER_MODE=(TYPE=session)(METHOD=basic))
       )
     )
+#####################################################
+# Мартынов Евгений Васильевич
+# FIS RTL Бинбанка
+# Добавил по OTRS 025140091
+#####################################################
+fisret=(DESCRIPTION=
+           (ENABLE=BROKEN)
+           (LOAD_BALANCE=off)
+           (FAILOVER=on)
+           (TRANSPORT_CONNECT_TIMEOUT=10)
+           (ADDRESS=(PROTOCOL=tcp)(HOST=fiSret-prm.oradb.svc.corp.icba.biz)(PORT=1521))
+           (ADDRESS=(PROTOCOL=tcp)(HOST=fiSret-stb.oradb.svc.corp.icba.biz)(PORT=1521))
+           (CONNECT_DATA=
+              (SERVICE_NAME= fisret_prm_taf)
+              (FAILOVER_MODE=(TYPE=session)(METHOD=basic))
+           )
+       )
 
 #####################################################
 # Коровин М.А., «Тестовый Genesys». 
@@ -5579,15 +6014,54 @@ GENESYS1_TST =
     )
   )
 
-GENESYS = 
+GENESYS, GENESIS = 
  (DESCRIPTION = 
    (ADDRESS_LIST = 
-     (ADDRESS=(PROTOCOL=TCP)(HOST=db-gen-ora1.open.ru)(PORT=1526)) 
-     (ADDRESS=(PROTOCOL=TCP)(HOST=db-gen-ora2.open.ru)(PORT=1526)) 
+     (ADDRESS=(PROTOCOL=TCP)(HOST=genesis-h1.oradb.open.ru)(PORT=1526)) 
+     (ADDRESS=(PROTOCOL=TCP)(HOST=genesis-h2.oradb.open.ru)(PORT=1526)) 
      (FAILOVER=TRUE) 
    ) 
    (CONNECT_DATA = 
-     (SERVICE_NAME = GENESISPR) 
+     (SERVICE_NAME = genesis_prm_taf) 
+     (SERVER=DEDICATED) 
+   ) 
+ )
+
+GENESIS_STB = 
+ (DESCRIPTION = 
+   (ADDRESS_LIST = 
+     (ADDRESS=(PROTOCOL=TCP)(HOST=genesis-h1.oradb.open.ru)(PORT=1526)) 
+     (ADDRESS=(PROTOCOL=TCP)(HOST=genesis-h2.oradb.open.ru)(PORT=1526)) 
+     (FAILOVER=TRUE) 
+   ) 
+   (CONNECT_DATA = 
+     (SERVICE_NAME = genesis_stb_taf) 
+     (SERVER=DEDICATED) 
+   ) 
+ )
+
+GENREP = 
+ (DESCRIPTION = 
+   (ADDRESS_LIST = 
+     (ADDRESS=(PROTOCOL=TCP)(HOST=db-genrep01.open.ru)(PORT=1526)) 
+     (ADDRESS=(PROTOCOL=TCP)(HOST=db-genrep02.open.ru)(PORT=1526)) 
+     (FAILOVER=TRUE) 
+   ) 
+   (CONNECT_DATA = 
+     (SERVICE_NAME = genrep_prm_taf) 
+     (SERVER=DEDICATED) 
+   ) 
+ )
+
+GENREP_STB = 
+ (DESCRIPTION = 
+   (ADDRESS_LIST = 
+     (ADDRESS=(PROTOCOL=TCP)(HOST=db-genrep01.open.ru)(PORT=1526)) 
+     (ADDRESS=(PROTOCOL=TCP)(HOST=db-genrep02.open.ru)(PORT=1526)) 
+     (FAILOVER=TRUE) 
+   ) 
+   (CONNECT_DATA = 
+     (SERVICE_NAME = genrep_stb_taf) 
      (SERVER=DEDICATED) 
    ) 
  )
@@ -5606,6 +6080,21 @@ gen_rgs =
         (FAILOVER_MODE=(TYPE=session)(METHOD=basic))
       )
 )
+
+# OTRS 019998095
+gen_br =
+    (DESCRIPTION=
+      (ENABLE=BROKEN)
+      (LOAD_BALANCE=off)
+      (FAILOVER=on)
+      (TRANSPORT_CONNECT_TIMEOUT=10)
+        (ADDRESS=(PROTOCOL=tcp)(HOST= gen_br-h1.oradb.open.ru)(PORT=1527))
+        (ADDRESS=(PROTOCOL=tcp)(HOST= gen_br-h2.oradb.open.ru)(PORT=1527))
+      (CONNECT_DATA=
+        (SERVICE_NAME= gen_br_prm_taf)
+        (FAILOVER_MODE=(TYPE=session)(METHOD=basic))
+      )
+    )
 
 
 
@@ -5670,8 +6159,9 @@ efr_new =
 
 #####################################################
 # Маевский Илья Дмитриевич, Смирнов Роман Николаевич
-# Бизнес приложение "Единое Фронтальное Решение" - домен Clients
+# EFR
 
+# Бизнес приложение "Единое Фронтальное Решение" - домен Clients
 EFSCLNTS =
    (DESCRIPTION=
       (ENABLE=BROKEN)
@@ -5686,8 +6176,21 @@ EFSCLNTS =
       )
    )
 
-# Бизнес приложение "Единое Фронтальное Решение" - домен Products
+EFSCLNTS_STB =
+   (DESCRIPTION=
+      (ENABLE=BROKEN)
+      (LOAD_BALANCE=off)
+      (FAILOVER=on)
+      (TRANSPORT_CONNECT_TIMEOUT=10)
+        (ADDRESS=(PROTOCOL=tcp)(HOST=efsclnts-h1.oradb.open.ru)(PORT=1526))
+        (ADDRESS=(PROTOCOL=tcp)(HOST=efsclnts-h2.oradb.open.ru)(PORT=1526))
+      (CONNECT_DATA=
+        (SERVICE_NAME=efsclnts_stb_taf)
+        (FAILOVER_MODE=(TYPE=session)(METHOD=basic))
+      )
+   )
 
+# Бизнес приложение "Единое Фронтальное Решение" - домен Products
 EFSPRDS =
    (DESCRIPTION=
       (ENABLE=BROKEN)
@@ -5698,6 +6201,20 @@ EFSPRDS =
         (ADDRESS=(PROTOCOL=tcp)(HOST=efsprds-h2.oradb.open.ru)(PORT=1526))
       (CONNECT_DATA=
         (SERVICE_NAME=efsprds_prm_taf)
+        (FAILOVER_MODE=(TYPE=session)(METHOD=basic))
+      )
+   )
+
+EFSPRDS_STB =
+   (DESCRIPTION=
+      (ENABLE=BROKEN)
+      (LOAD_BALANCE=off)
+      (FAILOVER=on)
+      (TRANSPORT_CONNECT_TIMEOUT=10)
+        (ADDRESS=(PROTOCOL=tcp)(HOST=efsprds-h1.oradb.open.ru)(PORT=1526))
+        (ADDRESS=(PROTOCOL=tcp)(HOST=efsprds-h2.oradb.open.ru)(PORT=1526))
+      (CONNECT_DATA=
+        (SERVICE_NAME=efsprds_stb_taf)
         (FAILOVER_MODE=(TYPE=session)(METHOD=basic))
       )
    )
@@ -5716,6 +6233,109 @@ EFSSVCS =
         (FAILOVER_MODE=(TYPE=session)(METHOD=basic))
       )
    )
+
+EFSSVCS_STB =
+   (DESCRIPTION=
+      (ENABLE=BROKEN)
+      (LOAD_BALANCE=off)
+      (FAILOVER=on)
+      (TRANSPORT_CONNECT_TIMEOUT=10)
+        (ADDRESS=(PROTOCOL=tcp)(HOST=efssvcs-h1.oradb.open.ru)(PORT=1526))
+        (ADDRESS=(PROTOCOL=tcp)(HOST=efssvcs-h2.oradb.open.ru)(PORT=1526))
+      (CONNECT_DATA=
+        (SERVICE_NAME=efssvcs_stb_taf)
+        (FAILOVER_MODE=(TYPE=session)(METHOD=basic))
+      )
+   )
+
+# AL32UTF8
+# Бизнес приложение "Единое Фронтальное Решение" домен Clients
+EFRCLNTS =
+   (DESCRIPTION=
+      (ENABLE=BROKEN)
+      (LOAD_BALANCE=off)
+      (FAILOVER=on)
+      (TRANSPORT_CONNECT_TIMEOUT=10)
+        (ADDRESS=(PROTOCOL=tcp)(HOST=efsclnts-h1.oradb.open.ru)(PORT=1526))
+        (ADDRESS=(PROTOCOL=tcp)(HOST=efsclnts-h2.oradb.open.ru)(PORT=1526))
+      (CONNECT_DATA=
+        (SERVICE_NAME=efrclnts_prm_taf)
+        (FAILOVER_MODE=(TYPE=session)(METHOD=basic))
+      )
+   )
+
+EFRCLNTS_STB =
+   (DESCRIPTION=
+      (ENABLE=BROKEN)
+      (LOAD_BALANCE=off)
+      (FAILOVER=on)
+      (TRANSPORT_CONNECT_TIMEOUT=10)
+        (ADDRESS=(PROTOCOL=tcp)(HOST=efsclnts-h1.oradb.open.ru)(PORT=1526))
+        (ADDRESS=(PROTOCOL=tcp)(HOST=efsclnts-h2.oradb.open.ru)(PORT=1526))
+      (CONNECT_DATA=
+        (SERVICE_NAME=efrclnts_stb_taf)
+        (FAILOVER_MODE=(TYPE=session)(METHOD=basic))
+      )
+   )
+
+# Бизнес приложение "Единое Фронтальное Решение" домен Products
+EFRPRDS =
+   (DESCRIPTION=
+      (ENABLE=BROKEN)
+      (LOAD_BALANCE=off)
+      (FAILOVER=on)
+      (TRANSPORT_CONNECT_TIMEOUT=10)
+        (ADDRESS=(PROTOCOL=tcp)(HOST=efsprds-h1.oradb.open.ru)(PORT=1526))
+        (ADDRESS=(PROTOCOL=tcp)(HOST=efsprds-h2.oradb.open.ru)(PORT=1526))
+      (CONNECT_DATA=
+        (SERVICE_NAME=efrprds_prm_taf)
+        (FAILOVER_MODE=(TYPE=session)(METHOD=basic))
+      )
+   )
+
+EFRPRDS_STB =
+   (DESCRIPTION=
+      (ENABLE=BROKEN)
+      (LOAD_BALANCE=off)
+      (FAILOVER=on)
+      (TRANSPORT_CONNECT_TIMEOUT=10)
+        (ADDRESS=(PROTOCOL=tcp)(HOST=efsprds-h1.oradb.open.ru)(PORT=1526))
+        (ADDRESS=(PROTOCOL=tcp)(HOST=efsprds-h2.oradb.open.ru)(PORT=1526))
+      (CONNECT_DATA=
+        (SERVICE_NAME=efrprds_stb_taf)
+        (FAILOVER_MODE=(TYPE=session)(METHOD=basic))
+      )
+   )
+
+# Бизнес приложение "Единое Фронтальное Решение" домен Services
+EFRSVCS =
+   (DESCRIPTION=
+      (ENABLE=BROKEN)
+      (LOAD_BALANCE=off)
+      (FAILOVER=on)
+      (TRANSPORT_CONNECT_TIMEOUT=10)
+        (ADDRESS=(PROTOCOL=tcp)(HOST=efssvcs-h1.oradb.open.ru)(PORT=1526))
+        (ADDRESS=(PROTOCOL=tcp)(HOST=efssvcs-h2.oradb.open.ru)(PORT=1526))
+      (CONNECT_DATA=
+        (SERVICE_NAME=efrsvcs_prm_taf)
+        (FAILOVER_MODE=(TYPE=session)(METHOD=basic))
+      )
+   )
+
+EFRSVCS_STB =
+   (DESCRIPTION=
+      (ENABLE=BROKEN)
+      (LOAD_BALANCE=off)
+      (FAILOVER=on)
+      (TRANSPORT_CONNECT_TIMEOUT=10)
+        (ADDRESS=(PROTOCOL=tcp)(HOST=efssvcs-h1.oradb.open.ru)(PORT=1526))
+        (ADDRESS=(PROTOCOL=tcp)(HOST=efssvcs-h2.oradb.open.ru)(PORT=1526))
+      (CONNECT_DATA=
+        (SERVICE_NAME=efrsvcs_stb_taf)
+        (FAILOVER_MODE=(TYPE=session)(METHOD=basic))
+      )
+   )
+
 
 #####################################################
 # OTRS 015077786
@@ -5809,6 +6429,26 @@ SQLARTT =
         (FAILOVER_MODE=(TYPE=session)(METHOD=basic))
       )
    )
+
+# Тестовая база
+SQLARTT2 =
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = TCP)(HOST = db-sqlartt02.open.ru)(PORT = 9999))
+    (CONNECT_DATA =
+      (SERVER = DEDICATED)
+      (SERVICE_NAME = sqlartt2)
+    )
+  )
+
+# Тестовая база
+SQLARTT3 =
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = TCP)(HOST = db-sqlartt03.open.ru)(PORT = 9999))
+    (CONNECT_DATA =
+      (SERVER = DEDICATED)
+      (SERVICE_NAME = sqlartt3)
+    )
+  )
 
 
 ###########################################################################
@@ -5979,6 +6619,25 @@ GREENLK1_TST =
     )
   )
 
+GREENLKNT_TST =
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = TCP)(HOST = db-credfactory-nt01.open.ru)(PORT = 9999))
+    (CONNECT_DATA =
+      (SERVER = DEDICATED)
+      (SERVICE_NAME = grnlknt)
+    )
+  )
+
+greenlk_tst01 =
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = TCP)(HOST = db-msb01.open.ru)(PORT = 9999))
+    (CONNECT_DATA =
+      (SERVER = DEDICATED)
+      (SERVICE_NAME = greenlk)
+    )
+  )
+
+
 ###########################################################################
 # БД для претензионной Jira
 # Смирнов Роман Николаевич,Маевский Илья Дмитриевич
@@ -6020,6 +6679,15 @@ PRIMET2_TST =
     (CONNECT_DATA =
       (SERVER = DEDICATED)
       (SERVICE_NAME = primet2)
+    )
+  )
+
+PRIMET3_TST =
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = TCP)(HOST = db-prime-tst03.open.ru)(PORT = 9999))
+    (CONNECT_DATA =
+      (SERVER = DEDICATED)
+      (SERVICE_NAME = primet3)
     )
   )
 
@@ -6086,6 +6754,26 @@ AFRDKPT1_TST =
     (CONNECT_DATA =
       (SERVER = DEDICATED)
       (SERVICE_NAME = afrdkpt1)
+    )
+  )
+
+# Нагрузочное тестирование (база параметров)
+AFRDKPMPT1_TST =
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = TCP)(HOST = db-afrdkpm-nt01.open.ru)(PORT = 9999))
+    (CONNECT_DATA =
+      (SERVER = DEDICATED)
+      (SERVICE_NAME = afrdkpmpt1)
+    )
+  )
+
+# Нагрузочное тестирование (база расследований)
+AFRDKPMRT1_TST =
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = TCP)(HOST = db-afrdkpm-nt02.open.ru)(PORT = 9999))
+    (CONNECT_DATA =
+      (SERVER = DEDICATED)
+      (SERVICE_NAME = afrdkpmrt1)
     )
   )
 
@@ -6158,6 +6846,20 @@ TIBCOBPM =
       )
    )
 
+TIBCOBPM_DR =
+   (DESCRIPTION=
+      (ENABLE=BROKEN)
+      (LOAD_BALANCE=off)
+      (FAILOVER=on)
+      (TRANSPORT_CONNECT_TIMEOUT=10)
+        (ADDRESS=(PROTOCOL=tcp)(HOST=db-bpm05.open.ru)(PORT=1526))
+        (ADDRESS=(PROTOCOL=tcp)(HOST=db-bpm06.open.ru)(PORT=1526))
+      (CONNECT_DATA=
+        (SERVICE_NAME=tibcobpm_prm_taf)
+        (FAILOVER_MODE=(TYPE=session)(METHOD=basic))
+      )
+   )
+
 ###########################################################################
 # СЦУ Spacewalk
 # Владелец: Захаров Максим Игоревич (группа Unix-Admin)
@@ -6210,6 +6912,19 @@ INGENICO =
       )
    )
 
+
+TMS=
+  (DESCRIPTION=
+    (ADDRESS=
+      (PROTOCOL=TCP)
+      (HOST=192.168.192.55)
+      (PORT=1528)
+    )
+    (CONNECT_DATA=
+      (SID=tms)
+    )
+)
+
 ###########################################################################
 # Мультимодальная биометрическая система
 # Владелец: Мясников Петр Петрович, Давыдов Денис Андреевич
@@ -6228,6 +6943,15 @@ BIO =
         (FAILOVER_MODE=(TYPE=session)(METHOD=basic))
       )
    )
+
+BIOT1_TST =
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = TCP)(HOST = db-biotst01.open.ru)(PORT = 9999))
+    (CONNECT_DATA =
+      (SERVER = DEDICATED)
+      (SERVICE_NAME = biot1)
+    )
+  )
 
 ###############################
 # Система принятия кредитного решения, кредитный конвейер банка (SAS RTDM - SAS)
@@ -6316,6 +7040,15 @@ evam_stb =
       )
    )
 
+#OTRS 023334295
+EVAMNT_TST =
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = TCP)(HOST = db-evam-nt01.open.ru)(PORT = 9999))
+    (CONNECT_DATA =
+      (SERVER = DEDICATED)
+      (SERVICE_NAME = evamnt)
+    )
+  )
 
 ###############################
 # Контроль и мониторинг операций на финансовых рынках
@@ -6403,6 +7136,15 @@ SASAMLT_TST =
     )
   )
 
+SASAMLT2_TST =
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = TCP)(HOST = db-sasamltst002.open.ru)(PORT = 9999))
+    (CONNECT_DATA =
+      (SERVER = DEDICATED)
+      (SERVICE_NAME = sasamlt2)
+    )
+  )
+
 
 ###############################
 # Частное облако на базе Microfocus HCM/CSA
@@ -6484,6 +7226,16 @@ tibconib=(DESCRIPTION=
         (FAILOVER_MODE=(TYPE=session)(METHOD=basic))
       )
     )
+# Ващук А.М. - 020849923 - препрод
+TIBCONIBPRE_TST =
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = TCP)(HOST = db-tibconibpre001.open.ru)(PORT = 9999))
+    (CONNECT_DATA =
+      (SERVER = DEDICATED)
+      (SERVICE_NAME = tibconibpre)
+    )
+  )
+
 
 ###############################
 # TAIGER SINGAPORE
@@ -6541,6 +7293,15 @@ DQEHD_DBEX03 =
       (SERVICE_NAME = dqehd)
     )
   )
+  
+DQEHDUTF_DBEX03 =
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = TCP)(HOST = dbex03-scan.open.ru)(PORT = 1526))
+    (CONNECT_DATA =
+      (SERVER = DEDICATED)
+      (SERVICE_NAME = dqehdutf)
+    )
+  )  
 
 ###############################
 # Единый контакт центр Genesys - Smart IVR
@@ -6557,6 +7318,20 @@ GENIVR =
         (ADDRESS=(PROTOCOL=tcp)(HOST=genivr-h2.oradb.open.ru)(PORT=1526))
       (CONNECT_DATA=
         (SERVICE_NAME=genivr_prm_taf)
+        (FAILOVER_MODE=(TYPE=session)(METHOD=basic))
+      )
+   )
+
+GENIVR_STB =
+   (DESCRIPTION=
+      (ENABLE=BROKEN)
+      (LOAD_BALANCE=off)
+      (FAILOVER=on)
+      (TRANSPORT_CONNECT_TIMEOUT=10)
+        (ADDRESS=(PROTOCOL=tcp)(HOST=genivr-h1.oradb.open.ru)(PORT=1526))
+        (ADDRESS=(PROTOCOL=tcp)(HOST=genivr-h2.oradb.open.ru)(PORT=1526))
+      (CONNECT_DATA=
+        (SERVICE_NAME=genivr_stb_taf)
         (FAILOVER_MODE=(TYPE=session)(METHOD=basic))
       )
    )
@@ -6627,3 +7402,548 @@ scprod =
        (service_name = scprod)
      )
    )
+
+zpknt1_tst =
+  (DESCRIPTION =
+     (ADDRESS = (PROTOCOL = TCP)(HOST = db-zpk-nt01.open.ru)(PORT = 9999))
+     (CONNECT_DATA =
+    (SERVICE_NAME = zpknt1)
+  )
+)
+
+
+###############################
+# НТ БизнесПортал
+# Мартынов Дмитрий Вячеславович
+###############################
+
+STUBNTT1_TST =
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = TCP)(HOST = db-stubnttst001.open.ru)(PORT = 9999))
+    (CONNECT_DATA =
+      (SERVER = DEDICATED)
+      (SERVICE_NAME = stubntt1)
+    )
+  )
+
+
+######################################
+#Шутов М. Архив эксБИНа (до эры ЦФТ)
+######################################
+PEU = (DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=peu-h1.oradb.svc.corp.icba.biz)(PORT=1521)))(CONNECT_DATA=(SID=peu)))
+
+###########################################################################
+# Datelake SVA - ИС для службы внутреннего аудита
+# Лебедев Михаил Владимирович
+###########################################################################
+
+DLSVA =
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = TCP)(HOST = db-dlsva01.open.ru)(PORT = 1526))
+    (CONNECT_DATA =
+      (SERVER = DEDICATED)
+      (SERVICE_NAME = dlsva1)
+    )
+  )
+
+##################################################################################
+# система КПМ (Комплекс Превентивного Мониторинга)
+# Владелец – Глинский Андрей Михайлович, резервный – Богатырев Денис Вячеславович
+##################################################################################
+
+afrdkpmp =
+(DESCRIPTION=
+	(ENABLE=BROKEN)
+	(LOAD_BALANCE=off)
+	(FAILOVER=on)
+	(TRANSPORT_CONNECT_TIMEOUT=10)
+	(ADDRESS=(PROTOCOL=tcp)(HOST= afrdkpmp-h1.oradb.open.ru)(PORT=1526))
+	(ADDRESS=(PROTOCOL=tcp)(HOST= afrdkpmp-h2.oradb.open.ru)(PORT=1526))
+	(CONNECT_DATA=
+		(SERVICE_NAME= afrdkpmp_prm_taf)
+		(FAILOVER_MODE=(TYPE=session)(METHOD=basic))
+	)
+)
+
+afrdkpmp_stb =
+(DESCRIPTION=
+	(ENABLE=BROKEN)
+	(LOAD_BALANCE=off)
+	(FAILOVER=on)
+	(TRANSPORT_CONNECT_TIMEOUT=10)
+	(ADDRESS=(PROTOCOL=tcp)(HOST= afrdkpmp-h1.oradb.open.ru)(PORT=1526))
+	(ADDRESS=(PROTOCOL=tcp)(HOST= afrdkpmp-h2.oradb.open.ru)(PORT=1526))
+	(CONNECT_DATA=
+		(SERVICE_NAME= afrdkpmp_stb_taf)
+		(FAILOVER_MODE=(TYPE=session)(METHOD=basic))
+	)
+)
+
+afrdkpmr =
+(DESCRIPTION=
+	(ENABLE=BROKEN)
+	(LOAD_BALANCE=off)
+	(FAILOVER=on)
+	(TRANSPORT_CONNECT_TIMEOUT=10)
+	(ADDRESS=(PROTOCOL=tcp)(HOST= afrdkpmr-h1.oradb.open.ru)(PORT=1526))
+	(ADDRESS=(PROTOCOL=tcp)(HOST= afrdkpmr-h2.oradb.open.ru)(PORT=1526))
+	(CONNECT_DATA=
+		(SERVICE_NAME= afrdkpmr_prm_taf)
+		(FAILOVER_MODE=(TYPE=session)(METHOD=basic))
+	)
+)
+
+afrdkpmr_stb =
+(DESCRIPTION=
+	(ENABLE=BROKEN)
+	(LOAD_BALANCE=off)
+	(FAILOVER=on)
+	(TRANSPORT_CONNECT_TIMEOUT=10)
+	(ADDRESS=(PROTOCOL=tcp)(HOST= afrdkpmr-h1.oradb.open.ru)(PORT=1526))
+	(ADDRESS=(PROTOCOL=tcp)(HOST= afrdkpmr-h2.oradb.open.ru)(PORT=1526))
+	(CONNECT_DATA=
+		(SERVICE_NAME= afrdkpmr_stb_taf)
+		(FAILOVER_MODE=(TYPE=session)(METHOD=basic))
+	)
+)
+
+# 020539187
+AFRDKPT2_TST =
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = TCP)(HOST = db-afrdkpm-dev02.open.ru)(PORT = 9999))
+    (CONNECT_DATA =
+      (SERVER = DEDICATED)
+      (SERVICE_NAME = afrdkpt2)
+    )
+  )
+
+##################################################################################
+# Портал налогового мониторинга (Веб-приложение, документооборот)
+# Первухин Дмитрий Александрович, Искучеков Владимир Александрович
+##################################################################################
+
+PNM =
+   (DESCRIPTION=
+      (ENABLE=BROKEN)
+      (LOAD_BALANCE=off)
+      (FAILOVER=on)
+      (TRANSPORT_CONNECT_TIMEOUT=10)
+        (ADDRESS=(PROTOCOL=tcp)(HOST=pnm-h1.oradb.open.ru)(PORT=1526))
+        (ADDRESS=(PROTOCOL=tcp)(HOST=pnm-h2.oradb.open.ru)(PORT=1526))
+      (CONNECT_DATA=
+        (SERVICE_NAME=pnm_prm_taf)
+        (FAILOVER_MODE=(TYPE=session)(METHOD=basic))
+      )
+   )
+
+PNMT_TST =
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = TCP)(HOST = db-pnm-dev01.open.ru)(PORT = 9999))
+    (CONNECT_DATA =
+      (SERVER = DEDICATED)
+      (SERVICE_NAME = pnmt)
+    )
+  )
+
+PNMT1_TST =
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = TCP)(HOST = db-pnm-tst01.open.ru)(PORT = 9999))
+    (CONNECT_DATA =
+      (SERVER = DEDICATED)
+      (SERVICE_NAME = pnmt1)
+    )
+  )
+
+##################################################################################
+# ИДК (проект Финансового Департамента)
+# Кирюшкин С.В
+##################################################################################
+
+IDK =
+   (DESCRIPTION=
+      (ENABLE=BROKEN)
+      (LOAD_BALANCE=off)
+      (FAILOVER=on)
+      (TRANSPORT_CONNECT_TIMEOUT=10)
+        (ADDRESS=(PROTOCOL=tcp)(HOST=idk-h1.oradb.open.ru)(PORT=1526))
+        (ADDRESS=(PROTOCOL=tcp)(HOST=idk-h2.oradb.open.ru)(PORT=1526))
+      (CONNECT_DATA=
+        (SERVICE_NAME=idk_prm_taf)
+        (FAILOVER_MODE=(TYPE=session)(METHOD=basic))
+      )
+   )
+
+IDKT_TST =
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = TCP)(HOST = db-idk-tst01.open.ru)(PORT = 9999))
+    (CONNECT_DATA =
+      (SERVER = DEDICATED)
+      (SERVICE_NAME = idkt)
+    )
+  )
+
+# Препрод
+IDKT2_TST =
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = TCP)(HOST = db-idk-pre01.open.ru)(PORT = 9999))
+    (CONNECT_DATA =
+      (SERVER = DEDICATED)
+      (SERVICE_NAME = idkt2)
+    )
+  )
+
+# Второй тестовый контур
+IDK2T_TST =
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = TCP)(HOST = db-idk-tst02.open.ru)(PORT = 9999))
+    (CONNECT_DATA =
+      (SERVER = DEDICATED)
+      (SERVICE_NAME = idk2t)
+    )
+  )
+
+IDK21T_TST =
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = TCP)(HOST = db-idk-tst02.open.ru)(PORT = 9999))
+    (CONNECT_DATA =
+      (SERVER = DEDICATED)
+      (SERVICE_NAME = idk21t)
+    )
+  )
+
+##################################################################################
+# Проект Diasoft Flexterra BI
+# Кирюшкин С.В. Цыгарина М.В,
+##################################################################################
+flxtrt1_TST =
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = TCP)(HOST = db-flextst001.open.ru)(PORT = 9999))
+    (CONNECT_DATA =
+      (SERVER = DEDICATED)
+      (SERVICE_NAME = flxtrt1)
+    )
+  )
+
+
+##################################################################################
+# Аудит BigData (Couldera Ent)
+# Кулаков И.О.
+##################################################################################
+
+CLDR =
+   (DESCRIPTION=
+      (ENABLE=BROKEN)
+      (LOAD_BALANCE=off)
+      (FAILOVER=on)
+      (TRANSPORT_CONNECT_TIMEOUT=10)
+        (ADDRESS=(PROTOCOL=tcp)(HOST=cldr-h1.oradb.open.ru)(PORT=1526))
+        (ADDRESS=(PROTOCOL=tcp)(HOST=cldr-h2.oradb.open.ru)(PORT=1526))
+      (CONNECT_DATA=
+        (SERVICE_NAME=cldr_prm_taf)
+        (FAILOVER_MODE=(TYPE=session)(METHOD=basic))
+      )
+   )
+
+##################################################################################
+# Хранение расчёта моделей машинного обучения CRM МСБ
+# Дементьев Максим Олегович, Заспа Андрей Юрьевич, Отдел моделирования управления развития CRM кампаний департамента CRM МСБ Блока МСБ
+##################################################################################
+
+CRMMLMOD_TST =
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = TCP)(HOST = db-crmmlmod-tst01.open.ru)(PORT = 9999))
+    (CONNECT_DATA =
+      (SERVER = DEDICATED)
+      (SERVICE_NAME = crmmlmod)
+    )
+  )
+
+
+
+#####################
+#  Самохвалов Андрей Николаевич
+#####################
+FCS,PHYSICS, CREDMON =
+  (DESCRIPTION = 
+    (ENABLE = BROKEN)(LOAD_BALANCE = off)(FAILOVER = on)(TRANSPORT_CONNECT_TIMEOUT = 10)
+      (ADDRESS = (PROTOCOL = tcp)(HOST = physics-prm.oradb.svc.corp.icba.biz)(PORT = 1521))
+      (ADDRESS = (PROTOCOL = tcp)(HOST = physics-stb.oradb.svc.corp.icba.biz)(PORT = 1521))
+      (CONNECT_DATA = 
+        (SERVICE_NAME = physics_prm_taf)
+        (FAILOVER_MODE = (TYPE = session)
+        (METHOD = basic)
+      )
+    )
+  )
+
+##################################################################################
+# FIS Platform, участие в процессах обслуживания КИБ
+# Хлопонин Максим Вадимович, Отдел развития продуктов корпоративного блока
+##################################################################################
+
+FISTK =
+   (DESCRIPTION=
+      (ENABLE=BROKEN)
+      (LOAD_BALANCE=off)
+      (FAILOVER=on)
+      (TRANSPORT_CONNECT_TIMEOUT=10)
+        (ADDRESS=(PROTOCOL=tcp)(HOST=fistk-h1.oradb.open.ru)(PORT=1526))
+        (ADDRESS=(PROTOCOL=tcp)(HOST=fistk-h2.oradb.open.ru)(PORT=1526))
+      (CONNECT_DATA=
+        (SERVICE_NAME=fistk_prm_taf)
+        (FAILOVER_MODE=(TYPE=session)(METHOD=basic))
+      )
+   )
+
+# Препрод
+FISTKPRE_TST =
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = TCP)(HOST = db-fistktst01.open.ru)(PORT = 9999))
+    (CONNECT_DATA =
+      (SERVER = DEDICATED)
+      (SERVICE_NAME = fistkpre)
+    )
+  )
+
+# тест
+FISTKT2_TST =
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = TCP)(HOST = db-fistktst02.open.ru)(PORT = 9999))
+    (CONNECT_DATA =
+      (SERVER = DEDICATED)
+      (SERVICE_NAME = fistkt2)
+    )
+  )
+
+##################################################################################
+# Пилотка по риск-моделям - Кандауров Алексей - Neoflex
+##################################################################################
+riskmodt1=(DESCRIPTION=(ADDRESS=(PROTOCOL=tcp)(HOST=db-riskmodtst01.open.ru)(PORT=9991))(CONNECT_DATA=(SERVICE_NAME=riskmodt1)))
+
+##################################################################################
+# CVM.RTM - https://confluence.open.ru/x/wxg6GQ
+# Шмелев Евгений Игоревич
+##################################################################################
+
+CVMRTM =
+   (DESCRIPTION=
+      (ENABLE=BROKEN)
+      (LOAD_BALANCE=off)
+      (FAILOVER=on)
+      (TRANSPORT_CONNECT_TIMEOUT=10)
+        (ADDRESS=(PROTOCOL=tcp)(HOST=cvmrtm-h1.oradb.open.ru)(PORT=1526))
+        (ADDRESS=(PROTOCOL=tcp)(HOST=cvmrtm-h2.oradb.open.ru)(PORT=1526))
+      (CONNECT_DATA=
+        (SERVICE_NAME=cvmrtm_prm_taf)
+        (FAILOVER_MODE=(TYPE=session)(METHOD=basic))
+      )
+   )
+
+
+##################################################
+#  Sberbank - FinLine проект ведет Петр Мартынов  
+##################################################
+
+FINLINE_TST1, finlinet1 =
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = TCP)(HOST = db-finlinetst01.open.ru)(PORT = 9991))
+    (CONNECT_DATA =
+      (SERVER = DEDICATED)
+      (SERVICE_NAME = finlinet1)
+    )
+  )
+
+##################################################
+# Galaxy. Система Управления Знаниями (СУЗ)
+# Чистяков Борис Борисович, Казанцев Алексей Валерьевич
+##################################################
+SKYOF =
+   (DESCRIPTION=
+      (ENABLE=BROKEN)
+      (LOAD_BALANCE=off)
+      (FAILOVER=on)
+      (TRANSPORT_CONNECT_TIMEOUT=10)
+      (ADDRESS = (PROTOCOL = TCP)(HOST = skyof-h1.oradb.open.ru)(PORT = 1526))
+      (ADDRESS = (PROTOCOL = TCP)(HOST = skyof-h1.oradb.open.ru)(PORT = 1526))
+      (CONNECT_DATA=
+        (SERVICE_NAME=skyof_prm_taf)
+        (FAILOVER_MODE=(TYPE=session)(METHOD=basic))
+      )
+   )
+
+##################################################
+# Galaxy. Система Управления Знаниями (СУЗ)
+# контур разработки (DEV)
+# Чистяков Борис Борисович, Казанцев Алексей Валерьевич
+##################################################
+
+SKYOFT2_TST =
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = TCP)(HOST = db-skyoffice-dev01.open.ru)(PORT = 9999))
+    (CONNECT_DATA =
+      (SERVER = DEDICATED)
+      (SERVICE_NAME = skyoft2)
+    )
+  )
+
+
+##################################################
+# Galaxy. Система Управления Знаниями (СУЗ)
+# контур Препрод (PREPROD)
+# Чистяков Борис Борисович, Казанцев Алексей Валерьевич
+##################################################
+
+SKYOFT1_TST =
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = TCP)(HOST = db-skyoffice-pre01.open.ru)(PORT = 9999))
+    (CONNECT_DATA =
+      (SERVER = DEDICATED)
+      (SERVICE_NAME = skyoft1)
+    )
+  )
+
+##################################################
+# Calypso v16.1 для Департамента инвестиционного бизнеса
+# БД Системы среда Среда тестирования 2
+# Малышев Олег Александрович, Чередников Дмитрий Александрович
+##################################################
+CRISK_tst01 =
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = TCP)(HOST = db-calypso-tst01.open.ru)(PORT = 9999))
+    (CONNECT_DATA =
+      (SERVER = DEDICATED)
+      (SERVICE_NAME = criskt1)
+    )
+  )
+
+CRISK_tst02 =
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = TCP)(HOST = db-calypso-tst02.open.ru)(PORT = 9999))
+    (CONNECT_DATA =
+      (SERVER = DEDICATED)
+      (SERVICE_NAME = crisk)
+    )
+  )
+
+CRISK_tst03 =
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = TCP)(HOST = db-calypso-tst03.open.ru)(PORT = 9999))
+    (CONNECT_DATA =
+      (SERVER = DEDICATED)
+      (SERVICE_NAME = crisk)
+    )
+  )
+
+CRISK_tst04 =
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = TCP)(HOST = db-calypso-tst04.open.ru)(PORT = 9999))
+    (CONNECT_DATA =
+      (SERVER = DEDICATED)
+      (SERVICE_NAME = crisk)
+    )
+  )
+
+CRISK_tst05 =
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = TCP)(HOST = db-calypso-tst05.open.ru)(PORT = 9999))
+    (CONNECT_DATA =
+      (SERVER = DEDICATED)
+      (SERVICE_NAME = crisk)
+    )
+  )
+
+CCORE11_tst01 =
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = TCP)(HOST = db-calypso-tst01.open.ru)(PORT = 9999))
+    (CONNECT_DATA =
+      (SERVER = DEDICATED)
+      (SID = ccore11)
+    )
+  )
+
+CCORE11_tst02 =
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = TCP)(HOST = db-calypso-tst02.open.ru)(PORT = 9999))
+    (CONNECT_DATA =
+      (SERVER = DEDICATED)
+      (SID = ccore11)
+    )
+  )
+
+CCORE11_tst03 =
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = TCP)(HOST = db-calypso-tst03.open.ru)(PORT = 9999))
+    (CONNECT_DATA =
+      (SERVER = DEDICATED)
+      (SID = ccore11)
+    )
+  )
+
+CCORE11_tst04 =
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = TCP)(HOST = db-calypso-tst04.open.ru)(PORT = 9999))
+    (CONNECT_DATA =
+      (SERVER = DEDICATED)
+      (SID = ccore11)
+    )
+  )
+
+CCORE11_tst05 =
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = TCP)(HOST = db-calypso-tst05.open.ru)(PORT = 9999))
+    (CONNECT_DATA =
+      (SERVER = DEDICATED)
+      (SID = ccore11)
+    )
+  )
+
+##################################################
+# MFMS 
+# СМС информирование
+# Рябов Александр Павлович, Малютин Александр Александрович
+##################################################
+SMSTST =
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = TCP)(HOST = rumskapt520.open.ru)(PORT = 1528))
+    (CONNECT_DATA =
+      (SERVER = DEDICATED)
+      (SERVICE_NAME = smstst)
+    )
+  )
+
+##################################################
+# Finline - DBO от Сбербанк
+##################################################
+finline =
+    (DESCRIPTION=
+      (ENABLE=BROKEN)
+      (LOAD_BALANCE=off)
+      (FAILOVER=on)
+      (TRANSPORT_CONNECT_TIMEOUT=10)
+        (ADDRESS=(PROTOCOL=tcp)(HOST= db-finline01.open.ru)(PORT=1526))
+        (ADDRESS=(PROTOCOL=tcp)(HOST= db-finline02.open.ru)(PORT=1526))
+      (CONNECT_DATA=
+        (SERVICE_NAME= finline_prm_taf)
+        (FAILOVER_MODE=(TYPE=session)(METHOD=basic))
+      )
+)
+
+##################################################
+# SAP Business Objects
+# Шермергор Никита Юрьевич, Голос Дмитрий Валерьевич
+##################################################
+
+BOREPOS =
+   (DESCRIPTION=
+      (ENABLE=BROKEN)
+      (LOAD_BALANCE=off)
+      (FAILOVER=on)
+      (TRANSPORT_CONNECT_TIMEOUT=10)
+      (ADDRESS = (PROTOCOL = TCP)(HOST = borepos-h1.oradb.open.ru)(PORT = 1526))
+      (ADDRESS = (PROTOCOL = TCP)(HOST = borepos-h2.oradb.open.ru)(PORT = 1526))
+      (CONNECT_DATA=
+        (SERVICE_NAME=borepos_prm_taf)
+        (FAILOVER_MODE=(TYPE=session)(METHOD=basic))
+      )
+   )
+
