@@ -2,7 +2,7 @@ version: '3.4'
 
 x-common-variables: &common-variables
   ORACLE_USER: DEMENTEV_MAO[PxU_DCBUL_UMA_MOD]
-  ORACLE_PASSWORD: Toyota06#
+  ORACLE_PASSWORD: ToyotaC10#
   ORACLE_TNS: DATALAB
   NLS_LANG: AMERICAN_AMERICA.AL32UTF8
 
