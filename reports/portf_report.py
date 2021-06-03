@@ -272,6 +272,7 @@ def med_aggr_statistics(aggr_portf):
 
 def distr_aggr_statistics(aggr_portf, group_counts, with_tests=True, sign_level = 80):
     aggr_portf = aggr_portf.unstack().transpose()
+    aggr_portf = aggr_portf.reindex(columns=[True, False])
     aggr_portf = aggr_portf.fillna(0.0)
     aggr_portf.columns.name = None
     aggr_portf = aggr_portf.rename(columns={True : 'request_clients_ratio', False : 'other_clients_ratio'})
