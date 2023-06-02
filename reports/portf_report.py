@@ -238,7 +238,7 @@ def avg_aggr_statistics(aggr_portf, with_tests=True, sign_level = 80):
     aggr_portf = aggr_portf.loc[:, ['request_clients_mean', 'other_clients_mean', 'request_clients_std',
                                         'other_clients_std', 'request_clients_cnt', 'other_clients_cnt']]
 
-    if with_tests:
+    if with_tests and aggr_portf.shape[0] > 0:
         aggr_portf['f_test_pvalue'] = aggr_portf.loc[:, ['request_clients_std', 'other_clients_std',
                                                     'request_clients_cnt', 'other_clients_cnt']].apply(f_test, axis=1)
         aggr_portf['t_test_pvalue'] = aggr_portf.loc[:, ['request_clients_mean', 'other_clients_mean',
